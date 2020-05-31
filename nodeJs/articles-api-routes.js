@@ -57,33 +57,49 @@ apiRouter.route('/article-api/public/article')
             } else {
                 res.send(replace_mongoId_byPmid_inArray(allArticle));
             }
-        });//end of genericFindList()
+        });
     });
 
-function findPmid(term) {
-    var urlApi = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmode=json&usehistory=y&term=' + term
+
+// Get pmid list for articles with search of pubmed-api
+function find_Pmid_bySearch_with_terms(term) {
+    var urlApiSearch = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmode=json&usehistory=y&term=' + term
     let request = new XMLHttpRequest()
-    request.open("GET", urlApi)
+    request.open("GET", urlApiSearch)
     request.send()
-    request.onload = () => {
+    request.onload = function () {
         console.log("requestText :" + request.responseText)
-         if (request.status === 200) {
+        if (request.status === 200) {
             var responseJs = JSON.parse(request.responseText)
             var querykey = responseJs.esearchresult.querykey
             var webenv = responseJs.esearchresult.webenv
             console.log("querykey: " + querykey)
             console.log("webenv: " + webenv)
             console.log("idlist: " + responseJs.esearchresult.idlist)
-         }
+            find_Article_Data_byFtech_with_PMID(querykey, webenv)
+        }
     }
 }
 
-// Get PMID of articles with Pubmed api
+// Get all data for articles with fetch of pubmed-api
+function find_Article_Data_byFtech_with_PMID(querykey, webenv) {
+    var urlApiFetch = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&query_key=' + querykey + '&WebEnv=' + webenv + '&rettype=abstract&retmode=xml'
+    let request = new XMLHttpRequest()
+    request.open("GET", urlApiFetch)
+    request.send()
+    request.onload = () => {
+        console.log("requestXML :" + request.responseText)
+    }
+}
+
+// Get all data of articles with Pubmed api
 apiRouter.route('/article-api/public/articlePmidFinder/:term')
     .get(function (req, res, next) {
         var term = req.params.term
-        findPmid(term)
-            })
+        find_Pmid_bySearch_with_terms(term)
+    })
+
+
 
 exports.apiRouter = apiRouter;
 
