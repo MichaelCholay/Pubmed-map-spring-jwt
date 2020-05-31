@@ -68,7 +68,7 @@ function find_Pmid_bySearch_with_terms(term) {
     request.open("GET", urlApiSearch)
     request.send()
     request.onload = function () {
-        console.log("requestText :" + request.responseText)
+        //console.log("requestText :" + request.responseText)
         if (request.status === 200) {
             var responseJs = JSON.parse(request.responseText)
             var querykey = responseJs.esearchresult.querykey
@@ -81,17 +81,6 @@ function find_Pmid_bySearch_with_terms(term) {
     }
 }
 
-// Get all data for articles with fetch of pubmed-api
-function find_Article_Data_byFtech_with_PMID(querykey, webenv) {
-    var urlApiFetch = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&query_key=' + querykey + '&WebEnv=' + webenv + '&rettype=abstract&retmode=xml'
-    let request = new XMLHttpRequest()
-    request.open("GET", urlApiFetch)
-    request.send()
-    request.onload = () => {
-        console.log("requestXML :" + request.responseText)
-    }
-}
-
 // Get all data of articles with Pubmed api
 apiRouter.route('/article-api/public/articlePmidFinder/:term')
     .get(function (req, res, next) {
@@ -99,6 +88,91 @@ apiRouter.route('/article-api/public/articlePmidFinder/:term')
         find_Pmid_bySearch_with_terms(term)
     })
 
+// Get all data for articles with fetch of pubmed-api and xml conversion
+function find_Article_Data_byFtech_with_PMID (querykey, webenv) {
+    var urlApiFetch = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&query_key=' + querykey + '&WebEnv=' + webenv + '&rettype=abstract&retmode=xml'
+    let request = new XMLHttpRequest()
+    request.open("GET", urlApiFetch)
+    // request.responseType = "document"
+    request.send()
+    request.onload = () => {
+        console.log("requestSatus :" + request.status)
+        if (request.status === 200) {
+        //    bodyJs = xml_to_Js(request.responseText, options)
+           responseJs = convert.xml2js(request.responseText, options)
+           attributes_for_one_article(responseJs)
+        }
+    }
+}
+
+function attributes_for_one_article (responseJs) {
+    var article = new Object()
+    article.pmid = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.PMID
+    article.articleTitle = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.Article.ArticleTitle
+    article.journal = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.Article.Journal.Title
+    console.log("new article: " + JSON.stringify(article))
+}
+
+
+        
+        var publiList = []
+
+        // console.log("***** Find " + publiListInput.length + " articles with this request ******")
+
+        // recuperation des infos de chaque article de la requete
+        /*for (i in publiListInput) {
+            var article = new Object()
+            medlineCitation = publiListInput[i].MedlineCitation
+            article.pmid = publiListInput[i].MedlineCitation.PMID
+            article.articleTitle = publiListInput[i].MedlineCitation.Article.ArticleTitle
+            article.journal = publiListInput[i].MedlineCitation.Article.Journal.Title
+
+            ///////////////////////////////////////////////////////////////////
+            console.log("PMID " + publiListInput[i].MedlineCitation.PMID)
+            console.log("year " + publiListInput[i].PubmedData.History.PubMedPubDate.Year)
+            console.log("mont " + publiListInput[i].PubmedData.History.PubMedPubDate.Month)
+            console.log("day " + publiListInput[i].PubmedData.History.PubMedPubDate.Day)
+        }
+        }*/
+    
+
+
+// Conversion of xml results to Js object
+const removeJsonTextAttribute = function (value, parentElement) {
+    try {
+        const parentOfParent = parentElement._parent;
+        const pOpKeys = Object.keys(parentElement._parent);
+        const keyNo = pOpKeys.length;
+        const keyName = pOpKeys[keyNo - 1];
+        const arrOfKey = parentElement._parent[keyName];
+        const arrOfKeyLen = arrOfKey.length;
+        if (arrOfKeyLen > 0) {
+            const arr = arrOfKey;
+            const arrIndex = arrOfKey.length - 1;
+            arr[arrIndex] = value;
+        } else {
+            parentElement._parent[keyName] = value;
+        }
+    } catch (e) { }
+};
+
+var options = {
+    compact: true,
+    spaces: 2,
+    trim: true,
+    nativeType: false,
+    ignoreDeclaration: true,
+    ignoreInstruction: true,
+    ignoreAttributes: true,
+    ignoreComment: true,
+    ignoreCdata: true,
+    ignoreDoctype: true,
+    textFn: removeJsonTextAttribute
+};
+
+// function xml_to_Js (responseText, options) {
+//     convert.xml2js(responseText, options);
+// }
 
 
 exports.apiRouter = apiRouter;
