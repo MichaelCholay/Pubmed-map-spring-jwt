@@ -3,8 +3,8 @@ var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
 var assert = require('assert');
 
-var mongoDbUrl = 'mongodb://127.0.0.1:27017/test'; //by default
-var dbName = "test" //by default
+var mongoDbUrl = 'mongodb://127.0.0.1:27017/pubmedMap'; //by default
+var dbName = "pubmedMap" //by default
 var currentDb = null; //current MongoDB connection
 
 var setMongoDbUrl = function (dbUrl) {
