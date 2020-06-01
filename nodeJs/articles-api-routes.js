@@ -8,6 +8,8 @@ var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 var myGenericMongoClient = require('./my_generic_mongo_client');
 
+const optionDate = { year: "numeric", month: "2-digit", day: "2-digit" }
+
 // Replace mongoId by PMID
 function replace_mongoId_byPmid(article) {
     article.pmid = article._id;
@@ -89,7 +91,7 @@ apiRouter.route('/article-api/public/articlePmidFinder/:term')
     })
 
 // Get all data for articles with fetch of pubmed-api and xml conversion
-function find_Article_Data_byFtech_with_PMID (querykey, webenv) {
+function find_Article_Data_byFtech_with_PMID(querykey, webenv) {
     var urlApiFetch = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&query_key=' + querykey + '&WebEnv=' + webenv + '&rettype=abstract&retmode=xml'
     let request = new XMLHttpRequest()
     request.open("GET", urlApiFetch)
@@ -98,44 +100,105 @@ function find_Article_Data_byFtech_with_PMID (querykey, webenv) {
     request.onload = () => {
         console.log("requestSatus :" + request.status)
         if (request.status === 200) {
-        //    bodyJs = xml_to_Js(request.responseText, options)
-           responseJs = convert.xml2js(request.responseText, options)
-           attributes_for_one_article(responseJs)
+            responseJs = convert.xml2js(request.responseText, options)
+            var publiListInput = responseJs.PubmedArticleSet.PubmedArticle
+            //    console.log("publiListInput: " + JSON.stringify(publiListInput, null, " "))
+            if (publiListInput.length === undefined) {
+                attributes_for_one_article(responseJs)
+            } else attributes_for_list_of_articles(publiListInput)
+            
         }
     }
 }
 
-function attributes_for_one_article (responseJs) {
+// ArticleData when request return only one article
+function attributes_for_one_article(responseJs) {
+    console.log("***** 1 article found with this request ******")
     var article = new Object()
     article.pmid = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.PMID
     article.articleTitle = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.Article.ArticleTitle
     article.journal = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.Article.Journal.Title
-    console.log("new article: " + JSON.stringify(article))
+    date = new Date(Date.UTC(responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.DateCompleted.Year, responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.DateCompleted.Month - 1, responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.DateCompleted.Day))
+    article.publicationDate = date.toLocaleDateString(undefined, optionDate)
+    article.abstract = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.Article.Abstract.AbstractText
+    article.pubmedURL = "https://pubmed.ncbi.nlm.nih.gov/" + article.pmid
+    medlineCitation = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation
+    if (medlineCitation.hasOwnProperty("KeywordList")) {
+        article.keywordsList = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.KeywordList.Keyword
+    } else article.keywordsList = "Not available"
+    article.authorsList = []
+    AuthorsList_data(responseJs)
+    console.log("new article: " + JSON.stringify(article, null, " "))
 }
 
+// ArticleData when request return a list of articles
+function attributes_for_list_of_articles(publiListInput) {
+    console.log("***** " + publiListInput.length + " articles found with this request ******")
+    for (i in publiListInput) {
+        var article = new Object()
+        article.pmid = publiListInput[i].MedlineCitation.PMID
+        article.articleTitle = publiListInput[i].MedlineCitation.Article.ArticleTitle
+        article.journal = publiListInput[i].MedlineCitation.Article.Journal.Title
+        date = new Date(Date.UTC(publiListInput[i].MedlineCitation.DateCompleted.Year, publiListInput[i].MedlineCitation.DateCompleted.Month - 1, publiListInput[i].MedlineCitation.DateCompleted.Day))
+        article.publicationDate = date.toLocaleDateString(undefined, optionDate)
+        article.abstract = publiListInput[i].MedlineCitation.Article.Abstract.AbstractText
+        article.pubmedURL = "https://pubmed.ncbi.nlm.nih.gov/" + article.pmid
+        medlineCitation = publiListInput[i].MedlineCitation
+        if (medlineCitation.hasOwnProperty("KeywordList")) {
+            article.keywordsList = publiListInput[i].MedlineCitation.KeywordList.Keyword
+        } else article.keywordsList = "Not available"
+        article.authorsList = []
 
-        
-        var publiList = []
+        console.log()
+        console.log("------------------------- ARTICLE " + (Number(i) + 1) + " / " + publiListInput.length + " -------------------------")
+        console.log(JSON.stringify(article, null, " "))
+        console.log()
+    }
+}
 
-        // console.log("***** Find " + publiListInput.length + " articles with this request ******")
+// AuthorsData
+function AuthorsList_data(responseJs) {
+    var authorsListInput = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.Article.AuthorList.Author
+    for (i in authorsListInput) {
+        var author = new Object()
+        author.lastName = authorsListInput[i].LastName
+        author.foreName = authorsListInput[i].ForeName
+        authorsList.push(author)
+    }
 
-        // recuperation des infos de chaque article de la requete
-        /*for (i in publiListInput) {
-            var article = new Object()
-            medlineCitation = publiListInput[i].MedlineCitation
-            article.pmid = publiListInput[i].MedlineCitation.PMID
-            article.articleTitle = publiListInput[i].MedlineCitation.Article.ArticleTitle
-            article.journal = publiListInput[i].MedlineCitation.Article.Journal.Title
+}
 
-            ///////////////////////////////////////////////////////////////////
-            console.log("PMID " + publiListInput[i].MedlineCitation.PMID)
-            console.log("year " + publiListInput[i].PubmedData.History.PubMedPubDate.Year)
-            console.log("mont " + publiListInput[i].PubmedData.History.PubMedPubDate.Month)
-            console.log("day " + publiListInput[i].PubmedData.History.PubMedPubDate.Day)
-        }
-        }*/
-    
+// recuperation des infos de chaque auteur pour chaque article de la requete
+//  for (var y = 0; y <= authorsListInput.length - 1; y++) {
+//      author.lastName = authorsListInput[y].LastName
+//      author.foreName = authorsListInput[y].ForeName
+//      author.AffiliationInfo = authorsListInput[y].AffiliationInfo
+//      var affiliationInfoString = JSON.stringify(authorsListInput[y].AffiliationInfo)
+// console.log(typeof affiliationInfoString)
+//var affiliationParsed= JSON.parse(affiliationInfoString)
+// if (author.AffiliationInfo == undefined){
+//     return "Undefined value !"
+// } else if (affiliationInfoString.includes("Affiliation")){
+//     var affiliationAndEmail = authorsListInput[y].AffiliationInfo.Affiliation
+//     if (affiliationAndEmail.includes("Electronic address:")){
+//         console.log("Affiliation and Email: " + affiliationAndEmail)
+//         var affiliation = affiliationAndEmail.split('. Electronic address: ')
+//         author.affiliation = affiliation[0]
+//         console.log("Affiliation: " + author.affiliation)
+//         // console.log("type: " + typeof affiliation[1])
+//         if (affiliation[1].slice(-1) === '.') {
+//             author.email = affiliation[1].slice(0, affiliation[1].length - 1)
+//         } else author.email = affiliation[1]
+//     } else author.affiliation = authorsListInput[y].AffiliationInfo.Affiliation
+// } else author.affiliation = "Not published"
+//  console.log("affiliationInfo: " + affiliationInfoString)
+//  console.log("Affiliation: " + author.affiliation)
+// console.log(author.email)
+//  authorsList.push(author)
 
+// console.log("author: " + JSON.stringify(author))
+
+/////////////////////////////////////////////////////
 
 // Conversion of xml results to Js object
 const removeJsonTextAttribute = function (value, parentElement) {
@@ -194,57 +257,7 @@ exports.apiRouter = apiRouter;
         }
     })
 
-    //Get pour obtenir PMID des articles recherchés
-    try {
-        var term = 'hybrigenics'
-        const response1 = await got('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=' + term + '&retmode=json&usehistory=y', { responseType: "json" })
-        var querykey = response1.body.esearchresult.querykey
-        var webenv = response1.body.esearchresult.webenv
-        console.log("querykey: " + querykey)
-        console.log("webenv: " + webenv)
-        console.log("idlist: " + response1.body.esearchresult.idlist)
-    }
-    catch (error) {
-        console.log(error);
-    }
-
-
-    -----------A ESSAYER ----------------
-let pages = response.query.pages;
-Object.keys(pages).forEach(id => {
-    let page = pages[id];
-    console.log(page.title, page.foo);
-});
------------------------------------------
-
-    // GET pour obtenir les infos des articles à partir des PMID
-    //https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=30926242,30926243&rettype=abstract&retmode=xml
-    var eutilsUrl = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&query_key=' + querykey + '&WebEnv=' + webenv + '&rettype=abstract&retmode=xml'
-    try {
-        const response = await got(eutilsUrl);
-
-        // Options pour conversion xml -> Js / Json
-        var options = {
-            compact: true,
-            spaces: 2,
-            trim: true,
-            nativeType: false,
-            ignoreDeclaration: true,
-            ignoreInstruction: true,
-            ignoreAttributes: true,
-            ignoreComment: true,
-            ignoreCdata: true,
-            ignoreDoctype: true,
-            textFn: removeJsonTextAttribute
-        };
-        var bodyJson = convert.xml2json(response.body, options);
-        var bodyJs = convert.xml2js(response.body, options);
-
-        // Ecriture fichier JSON
-        fs.writeFile('test2.json', bodyJson, function (err) {
-            if (err) return console.log(err);
-            console.log('****** fichier json créé ******');
-        });
+    /
 
 
         var publiListInput = bodyJs.PubmedArticleSet.PubmedArticle
