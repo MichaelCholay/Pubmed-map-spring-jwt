@@ -137,34 +137,47 @@ function attributes_for_list_of_articles(publiListInput) {
     //for (i in publiListInput) {
     for (var i = 1; i <= publiListInput.length; i++) {
         var article = new Object()
-        article.pmid = publiListInput[i-1].MedlineCitation.PMID
-        article.articleTitle = publiListInput[i-1].MedlineCitation.Article.ArticleTitle
-        article.journal = publiListInput[i-1].MedlineCitation.Article.Journal.Title
-        date = new Date(Date.UTC(publiListInput[i-1].MedlineCitation.DateCompleted.Year, publiListInput[i-1].MedlineCitation.DateCompleted.Month - 1, publiListInput[i-1].MedlineCitation.DateCompleted.Day))
+        article.pmid = publiListInput[i - 1].MedlineCitation.PMID
+        article.articleTitle = publiListInput[i - 1].MedlineCitation.Article.ArticleTitle
+        article.journal = publiListInput[i - 1].MedlineCitation.Article.Journal.Title
+        date = new Date(Date.UTC(publiListInput[i - 1].MedlineCitation.DateCompleted.Year, publiListInput[i - 1].MedlineCitation.DateCompleted.Month - 1, publiListInput[i - 1].MedlineCitation.DateCompleted.Day))
         article.publicationDate = date.toLocaleDateString(undefined, optionDate)
-        article.abstract = publiListInput[i-1].MedlineCitation.Article.Abstract.AbstractText
+        article.abstract = publiListInput[i - 1].MedlineCitation.Article.Abstract.AbstractText
         article.pubmedURL = "https://pubmed.ncbi.nlm.nih.gov/" + article.pmid
-        medlineCitation = publiListInput[i-1].MedlineCitation
+        medlineCitation = publiListInput[i - 1].MedlineCitation
         if (medlineCitation.hasOwnProperty("KeywordList")) {
-            article.keywordsList = publiListInput[i-1].MedlineCitation.KeywordList.Keyword
+            article.keywordsList = publiListInput[i - 1].MedlineCitation.KeywordList.Keyword
         } else article.keywordsList = "Not available"
         var authorsList = []
         // authorsList_data_for_list_of_articles(publiListInput)
-        var authorsListInput = publiListInput[i-1].MedlineCitation.Article.AuthorList.Author
+        var authorsListInput = publiListInput[i - 1].MedlineCitation.Article.AuthorList.Author
         if (authorsListInput[0] != undefined) {
             for (var index = 1; index <= authorsListInput.length; index++) {
                 var author = new Object()
-                author.lastName = authorsListInput[index-1].LastName
-                author.foreName = authorsListInput[index-1].ForeName
-                
-                // article.authorsList = []
+                author.lastName = authorsListInput[index - 1].LastName
+                author.foreName = authorsListInput[index - 1].ForeName
+                // author.AffiliationInfo = authorsListInput[index - 1].AffiliationInfo
+                var affiliationInfoString = JSON.stringify(authorsListInput[index - 1].AffiliationInfo)
+                if (affiliationInfoString == undefined) {
+                    return "Not available"
+                } else if (affiliationInfoString.includes("Affiliation")) {
+                    var affiliationAndEmail = authorsListInput[index - 1].AffiliationInfo.Affiliation
+                    if (affiliationAndEmail.includes("Electronic address:")) {
+                        var affiliation = affiliationAndEmail.split('. Electronic address: ')
+                        author.affiliation = affiliation[0]
+                        if (affiliation[1].slice(-1) === '.') {
+                            author.email = affiliation[1].slice(0, affiliation[1].length - 1)
+                        } else author.email = affiliation[1]
+                    } else author.affiliation = authorsListInput[index - 1].AffiliationInfo.Affiliation
+                } else author.affiliation = "Not published"
                 authorsList.push(author)
             }
         } else {
-            author = authorsListInput
+            author.lastName = authorsListInput.LastName
+            author.foreName = authorsListInput.ForeName
             authorsList.push(author)
         }
-            
+
         console.log()
         console.log("------------------------- ARTICLE " + i + " / " + publiListInput.length + " -------------------------")
         console.log(JSON.stringify(article, null, " "))
@@ -181,13 +194,13 @@ function authorsList_data_for_list_of_articles(publiListInput) {
         var author = new Object()
         author.lastName = authorsListInput[index].LastName
         author.foreName = authorsListInput[index].ForeName
-        
+
         // article.authorsList = []
         authorsList.push(author)
     }
 
-        // console.log("***** Find " + authorsList.length + " authors for this article *****")
-        // console.log("authors: " + JSON.stringify(authorsList, null, " "))
+    // console.log("***** Find " + authorsList.length + " authors for this article *****")
+    // console.log("authors: " + JSON.stringify(authorsList, null, " "))
 }
 
 
