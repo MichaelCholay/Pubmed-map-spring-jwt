@@ -106,7 +106,7 @@ function find_Article_Data_byFtech_with_PMID(querykey, webenv) {
             if (publiListInput.length === undefined) {
                 attributes_for_one_article(responseJs)
             } else attributes_for_list_of_articles(publiListInput)
-            
+
         }
     }
 }
@@ -127,45 +127,81 @@ function attributes_for_one_article(responseJs) {
         article.keywordsList = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.KeywordList.Keyword
     } else article.keywordsList = "Not available"
     article.authorsList = []
-    AuthorsList_data(responseJs)
+    //authorsList_data_for_one_article(responseJs)
     console.log("new article: " + JSON.stringify(article, null, " "))
 }
 
 // ArticleData when request return a list of articles
 function attributes_for_list_of_articles(publiListInput) {
     console.log("***** " + publiListInput.length + " articles found with this request ******")
-    for (i in publiListInput) {
+    //for (i in publiListInput) {
+    for (var i = 1; i <= publiListInput.length; i++) {
         var article = new Object()
-        article.pmid = publiListInput[i].MedlineCitation.PMID
-        article.articleTitle = publiListInput[i].MedlineCitation.Article.ArticleTitle
-        article.journal = publiListInput[i].MedlineCitation.Article.Journal.Title
-        date = new Date(Date.UTC(publiListInput[i].MedlineCitation.DateCompleted.Year, publiListInput[i].MedlineCitation.DateCompleted.Month - 1, publiListInput[i].MedlineCitation.DateCompleted.Day))
+        article.pmid = publiListInput[i-1].MedlineCitation.PMID
+        article.articleTitle = publiListInput[i-1].MedlineCitation.Article.ArticleTitle
+        article.journal = publiListInput[i-1].MedlineCitation.Article.Journal.Title
+        date = new Date(Date.UTC(publiListInput[i-1].MedlineCitation.DateCompleted.Year, publiListInput[i-1].MedlineCitation.DateCompleted.Month - 1, publiListInput[i-1].MedlineCitation.DateCompleted.Day))
         article.publicationDate = date.toLocaleDateString(undefined, optionDate)
-        article.abstract = publiListInput[i].MedlineCitation.Article.Abstract.AbstractText
+        article.abstract = publiListInput[i-1].MedlineCitation.Article.Abstract.AbstractText
         article.pubmedURL = "https://pubmed.ncbi.nlm.nih.gov/" + article.pmid
-        medlineCitation = publiListInput[i].MedlineCitation
+        medlineCitation = publiListInput[i-1].MedlineCitation
         if (medlineCitation.hasOwnProperty("KeywordList")) {
-            article.keywordsList = publiListInput[i].MedlineCitation.KeywordList.Keyword
+            article.keywordsList = publiListInput[i-1].MedlineCitation.KeywordList.Keyword
         } else article.keywordsList = "Not available"
-        article.authorsList = []
-
+        var authorsList = []
+        // authorsList_data_for_list_of_articles(publiListInput)
+        var authorsListInput = publiListInput[i-1].MedlineCitation.Article.AuthorList.Author
+        if (authorsListInput[0] != undefined) {
+            for (var index = 1; index <= authorsListInput.length; index++) {
+                var author = new Object()
+                author.lastName = authorsListInput[index-1].LastName
+                author.foreName = authorsListInput[index-1].ForeName
+                
+                // article.authorsList = []
+                authorsList.push(author)
+            }
+        } else {
+            author = authorsListInput
+            authorsList.push(author)
+        }
+            
         console.log()
-        console.log("------------------------- ARTICLE " + (Number(i) + 1) + " / " + publiListInput.length + " -------------------------")
+        console.log("------------------------- ARTICLE " + i + " / " + publiListInput.length + " -------------------------")
         console.log(JSON.stringify(article, null, " "))
         console.log()
+        console.log("***** Find " + authorsList.length + " author(s) for this article *****")
+        console.log("author(s): " + JSON.stringify(authorsList, null, " "))
     }
 }
 
-// AuthorsData
-function AuthorsList_data(responseJs) {
-    var authorsListInput = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.Article.AuthorList.Author
+// AuthorsData when request return a list of articles
+function authorsList_data_for_list_of_articles(publiListInput) {
+    var authorsListInput = publiListInput[i].MedlineCitation.Article.AuthorList.Author
+    for (index in authorsListInput) {
+        var author = new Object()
+        author.lastName = authorsListInput[index].LastName
+        author.foreName = authorsListInput[index].ForeName
+        
+        // article.authorsList = []
+        authorsList.push(author)
+    }
+
+        // console.log("***** Find " + authorsList.length + " authors for this article *****")
+        // console.log("authors: " + JSON.stringify(authorsList, null, " "))
+}
+
+
+// AuthorsData when request return only one article
+function AuthorsList_data_for_one_article(responseJs) {
+    var authorsListInput = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.Article.AuthorList
     for (i in authorsListInput) {
         var author = new Object()
         author.lastName = authorsListInput[i].LastName
         author.foreName = authorsListInput[i].ForeName
-        authorsList.push(author)
+        console.log(author)
+        // authorsList.push(author)
     }
-
+    // return authorsList
 }
 
 // recuperation des infos de chaque auteur pour chaque article de la requete
