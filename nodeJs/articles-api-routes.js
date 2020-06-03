@@ -184,8 +184,21 @@ function attributes_for_list_of_articles(publiListInput) {
         console.log()
         console.log("***** Find " + authorsList.length + " author(s) for this article *****")
         console.log("author(s): " + JSON.stringify(authorsList, null, " "))
+
+        mongoDbInsert(article)
+        
     }
 }
+
+function mongoDbInsert (req, res, next) {
+    var newArticle = res;
+    myGenericMongoClient.genericInsertOne('articles',
+        newArticle,
+        function (err, res) {
+            res.send(newArticle);
+            console.log("Article with PMID: " + article.pmid + " is successfully saved")
+        });
+    }
 
 // AuthorsData when request return a list of articles
 function authorsList_data_for_list_of_articles(publiListInput) {
