@@ -140,12 +140,18 @@ function attributes_for_list_of_articles(publiListInput) {
         article.pmid = publiListInput[i - 1].MedlineCitation.PMID
         article.articleTitle = publiListInput[i - 1].MedlineCitation.Article.ArticleTitle
         article.journal = publiListInput[i - 1].MedlineCitation.Article.Journal.Title
-        date = new Date(Date.UTC(publiListInput[i - 1].MedlineCitation.DateCompleted.Year, publiListInput[i - 1].MedlineCitation.DateCompleted.Month - 1, publiListInput[i - 1].MedlineCitation.DateCompleted.Day))
+        //////////
+        var medlineCitationProperty = publiListInput[i - 1].MedlineCitation
+        var articleProperty = publiListInput[i - 1].MedlineCitation.Article
+        if (medlineCitationProperty.hasOwnProperty("DateCompleted")){
+            date = new Date(Date.UTC(medlineCitationProperty.DateCompleted.Year, medlineCitationProperty.DateCompleted.Month - 1, medlineCitationProperty.DateCompleted.Day))
+        } else date = new Date(Date.UTC(articleProperty.ArticleDate.Year, articleProperty.ArticleDate.Month - 1, articleProperty.ArticleDate.Day))
         article.publicationDate = date.toLocaleDateString(undefined, optionDate)
+        
+        ///////////
         article.abstract = publiListInput[i - 1].MedlineCitation.Article.Abstract.AbstractText
         article.pubmedURL = "https://pubmed.ncbi.nlm.nih.gov/" + article.pmid
-        medlineCitation = publiListInput[i - 1].MedlineCitation
-        if (medlineCitation.hasOwnProperty("KeywordList")) {
+        if (medlineCitationProperty.hasOwnProperty("KeywordList")) {
             article.keywordsList = publiListInput[i - 1].MedlineCitation.KeywordList.Keyword
         } else article.keywordsList = "Not available"
         var authorsList = []
@@ -196,7 +202,7 @@ function mongoDbInsert (req, res, next) {
         newArticle,
         function (err, res) {
             res.send(newArticle);
-            console.log("Article with PMID: " + article.pmid + " is successfully saved")
+            console.log("Article is successfully saved")
         });
     }
 
