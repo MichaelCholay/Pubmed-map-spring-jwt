@@ -22,7 +22,7 @@ var closeCurrentMongoDBConnection = function () {
 
 var executeInMongoDbConnection = function (callback_with_db) {
 	if (currentDb == null) {
-		MongoClient.connect(mongoDbUrl, function (err, db) {
+		MongoClient.connect(mongoDbUrl, { useUnifiedTopology: true }, function (err, db) {
 			if (err != null) {
 				console.log("mongoDb connection error = " + err + " for dbUrl=" + mongoDbUrl);
 			}
