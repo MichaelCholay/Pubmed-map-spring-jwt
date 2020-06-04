@@ -140,21 +140,22 @@ function attributes_for_list_of_articles(publiListInput) {
         article.pmid = publiListInput[i - 1].MedlineCitation.PMID
         article.articleTitle = publiListInput[i - 1].MedlineCitation.Article.ArticleTitle
         article.journal = publiListInput[i - 1].MedlineCitation.Article.Journal.Title
-        //////////
+     
         var medlineCitationProperty = publiListInput[i - 1].MedlineCitation
         var articleProperty = publiListInput[i - 1].MedlineCitation.Article
         if (medlineCitationProperty.hasOwnProperty("DateCompleted")){
             date = new Date(Date.UTC(medlineCitationProperty.DateCompleted.Year, medlineCitationProperty.DateCompleted.Month - 1, medlineCitationProperty.DateCompleted.Day))
         } else date = new Date(Date.UTC(articleProperty.ArticleDate.Year, articleProperty.ArticleDate.Month - 1, articleProperty.ArticleDate.Day))
         article.publicationDate = date.toLocaleDateString(undefined, optionDate)
-        
-        ///////////
+
         article.abstract = publiListInput[i - 1].MedlineCitation.Article.Abstract.AbstractText
         article.pubmedURL = "https://pubmed.ncbi.nlm.nih.gov/" + article.pmid
+
         if (medlineCitationProperty.hasOwnProperty("KeywordList")) {
             article.keywordsList = publiListInput[i - 1].MedlineCitation.KeywordList.Keyword
         } else article.keywordsList = "Not available"
-        var authorsList = []
+
+        article.authorsList = []
         // authorsList_data_for_list_of_articles(publiListInput)
         var authorsListInput = publiListInput[i - 1].MedlineCitation.Article.AuthorList.Author
         if (authorsListInput[0] != undefined) {
@@ -176,35 +177,41 @@ function attributes_for_list_of_articles(publiListInput) {
                         } else author.email = affiliation[1]
                     } else author.affiliation = authorsListInput[index - 1].AffiliationInfo.Affiliation
                 } else author.affiliation = "Not published"
-                authorsList.push(author)
+                article.authorsList.push(author)
             }
         } else {
             author.lastName = authorsListInput.LastName
             author.foreName = authorsListInput.ForeName
-            authorsList.push(author)
+            article.authorsList.push(author)
         }
 
         console.log()
         console.log("------------------------- ARTICLE " + i + " / " + publiListInput.length + " -------------------------")
         console.log(JSON.stringify(article, null, " "))
         console.log()
-        console.log("***** Find " + authorsList.length + " author(s) for this article *****")
-        console.log("author(s): " + JSON.stringify(authorsList, null, " "))
+        console.log("***** Find " + article.authorsList.length + " author(s) for this article *****")
+        console.log("author(s): " + JSON.stringify(article.authorsList, null, " "))
 
-        mongoDbInsert(article)
+        //mongoDbInsert(null, article)
+        myGenericMongoClient.genericInsertOne('articles',
+        article,
+        function (err, res) {
+            res.send(article);
+        });
+        console.log("Article with PMID " + article.pmid + " is successfully saved")
         
     }
 }
 
-function mongoDbInsert (req, res, next) {
-    var newArticle = res;
-    myGenericMongoClient.genericInsertOne('articles',
-        newArticle,
-        function (err, res) {
-            res.send(newArticle);
-            console.log("Article is successfully saved")
-        });
-    }
+// function mongoDbInsert (req, res, next) {
+//     var newArticle = res;
+//     myGenericMongoClient.genericInsertOne('articles',
+//         newArticle,
+//         function (err, res) {
+//             res.send(newArticle);
+//             console.log("Article is successfully saved")
+//         });
+//     }
 
 // AuthorsData when request return a list of articles
 function authorsList_data_for_list_of_articles(publiListInput) {
