@@ -115,16 +115,28 @@ function find_Article_Data_byFtech_with_PMID(querykey, webenv) {
 function attributes_for_one_article(responseJs) {
     console.log("***** 1 article found with this request ******")
     var article = new Object()
-    article.pmid = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.PMID
-    article.articleTitle = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.Article.ArticleTitle
-    article.journal = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.Article.Journal.Title
-    date = new Date(Date.UTC(responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.DateCompleted.Year, responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.DateCompleted.Month - 1, responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.DateCompleted.Day))
+    var medlineCitationPropertyOneArticle = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation
+    var articlePropertyOneArticle = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.Article
+
+
+    article.pmid = medlineCitationPropertyOneArticle.PMID
+    article.articleTitle = articlePropertyOneArticle.ArticleTitle
+    article.journal = articlePropertyOneArticle.Journal.Title
+
+
+    if (medlineCitationPropertyOneArticle.hasOwnProperty("DateCompleted")) {
+        date = new Date(Date.UTC(medlineCitationPropertyOneArticle.DateCompleted.Year, medlineCitationPropertyOneArticle.DateCompleted.Month - 1, medlineCitationPropertyOneArticle.DateCompleted.Day))
+    } else date = new Date(Date.UTC(articlePropertyOneArticle.ArticleDate.Year, articlePropertyOneArticle.ArticleDate.Month - 1, articlePropertyOneArticle.ArticleDate.Day))
     article.publicationDate = date.toLocaleDateString(undefined, optionDate)
-    article.abstract = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.Article.Abstract.AbstractText
+
+    dateOfRevision = new Date(Date.UTC(medlineCitationPropertyOneArticle.DateRevised.Year, medlineCitationPropertyOneArticle.DateRevised.Month - 1, medlineCitationPropertyOneArticle.DateRevised.Day))
+    article.dateRevised = dateOfRevision.toLocaleDateString(undefined, optionDate)
+
+    article.abstract = articlePropertyOneArticle.Abstract.AbstractText
     article.pubmedURL = "https://pubmed.ncbi.nlm.nih.gov/" + article.pmid
-    medlineCitation = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation
-    if (medlineCitation.hasOwnProperty("KeywordList")) {
-        article.keywordsList = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.KeywordList.Keyword
+
+    if (medlineCitationPropertyOneArticle.hasOwnProperty("KeywordList")) {
+        article.keywordsList = medlineCitationPropertyOneArticle.KeywordList.Keyword
     } else article.keywordsList = "Not available"
     article.authorsList = []
     //authorsList_data_for_one_article(responseJs)
@@ -135,32 +147,34 @@ function attributes_for_one_article(responseJs) {
 function attributes_for_list_of_articles(publiListInput) {
     console.log("***** " + publiListInput.length + " articles found with this request ******")
     //for (i in publiListInput) {
+
     for (var i = 1; i <= publiListInput.length; i++) {
         var article = new Object()
-        article.pmid = publiListInput[i - 1].MedlineCitation.PMID
-        article.articleTitle = publiListInput[i - 1].MedlineCitation.Article.ArticleTitle
-        article.journal = publiListInput[i - 1].MedlineCitation.Article.Journal.Title
+        var medlineCitationPropertyListArticles = publiListInput[i - 1].MedlineCitation
+        var articlePropertyListArticles = publiListInput[i - 1].MedlineCitation.Article
 
-        var medlineCitationProperty = publiListInput[i - 1].MedlineCitation
-        var articleProperty = publiListInput[i - 1].MedlineCitation.Article
-        if (medlineCitationProperty.hasOwnProperty("DateCompleted")) {
-            date = new Date(Date.UTC(medlineCitationProperty.DateCompleted.Year, medlineCitationProperty.DateCompleted.Month - 1, medlineCitationProperty.DateCompleted.Day))
-        } else date = new Date(Date.UTC(articleProperty.ArticleDate.Year, articleProperty.ArticleDate.Month - 1, articleProperty.ArticleDate.Day))
+        article.pmid = medlineCitationPropertyListArticles.PMID
+        article.articleTitle = articlePropertyListArticles.ArticleTitle
+        article.journal = articlePropertyListArticles.Journal.Title
+
+        if (medlineCitationPropertyListArticles.hasOwnProperty("DateCompleted")) {
+            date = new Date(Date.UTC(medlineCitationPropertyListArticles.DateCompleted.Year, medlineCitationPropertyListArticles.DateCompleted.Month - 1, medlineCitationPropertyListArticles.DateCompleted.Day))
+        } else date = new Date(Date.UTC(articlePropertyListArticles.ArticleDate.Year, articlePropertyListArticles.ArticleDate.Month - 1, articlePropertyListArticles.ArticleDate.Day))
         article.publicationDate = date.toLocaleDateString(undefined, optionDate)
 
-        dateOfRevision = new Date(Date.UTC(medlineCitationProperty.DateRevised.Year, medlineCitationProperty.DateRevised.Month - 1, medlineCitationProperty.DateRevised.Day))
+        dateOfRevision = new Date(Date.UTC(medlineCitationPropertyListArticles.DateRevised.Year, medlineCitationPropertyListArticles.DateRevised.Month - 1, medlineCitationPropertyListArticles.DateRevised.Day))
         article.dateRevised = dateOfRevision.toLocaleDateString(undefined, optionDate)
 
-        article.abstract = publiListInput[i - 1].MedlineCitation.Article.Abstract.AbstractText
+        article.abstract = articlePropertyListArticles.Abstract.AbstractText
         article.pubmedURL = "https://pubmed.ncbi.nlm.nih.gov/" + article.pmid
 
-        if (medlineCitationProperty.hasOwnProperty("KeywordList")) {
-            article.keywordsList = publiListInput[i - 1].MedlineCitation.KeywordList.Keyword
+        if (medlineCitationPropertyListArticles.hasOwnProperty("KeywordList")) {
+            article.keywordsList = medlineCitationPropertyListArticles.KeywordList.Keyword
         } else article.keywordsList = "Not available"
 
         article.authorsList = []
         // authorsList_data_for_list_of_articles(publiListInput)
-        var authorsListInput = publiListInput[i - 1].MedlineCitation.Article.AuthorList.Author
+        var authorsListInput = articlePropertyListArticles.AuthorList.Author
         if (authorsListInput[0] != undefined) {
             for (var index = 1; index <= authorsListInput.length; index++) {
                 var author = new Object()
@@ -168,20 +182,21 @@ function attributes_for_list_of_articles(publiListInput) {
                 author.foreName = authorsListInput[index - 1].ForeName
                 // author.AffiliationInfo = authorsListInput[index - 1].AffiliationInfo
                 var affiliationInfoString = JSON.stringify(authorsListInput[index - 1].AffiliationInfo)
+                console.log("affiliationInfoString: " + affiliationInfoString + " is array: " + Array.isArray(affiliationInfoString))
                 // if (affiliationInfoString == undefined) {
                 //     return "Not available"
-                // } else if (affiliationInfoString.includes("Affiliation")) {
-                //     var affiliationAndEmail = authorsListInput[index - 1].AffiliationInfo.Affiliation
-                //     if (affiliationAndEmail == undefined) {
-                //         return "Not available"
-                //     } else if (affiliationAndEmail.includes("Electronic address:")) {
-                //         var affiliation = affiliationAndEmail.split('. Electronic address: ')
-                //         author.affiliation = affiliation[0]
-                //         if (affiliation[1].slice(-1) === '.') {
-                //             author.email = affiliation[1].slice(0, affiliation[1].length - 1)
-                //         } else author.email = affiliation[1]
-                //     } else author.affiliation = authorsListInput[index - 1].AffiliationInfo.Affiliation
-                // } else author.affiliation = "Not published"
+               /* } else*/ if (affiliationInfoString.includes("Affiliation")) {
+                    var affiliationAndEmail = authorsListInput[index - 1].AffiliationInfo.Affiliation
+                    if (affiliationAndEmail == undefined) {
+                        return "Not available"
+                    } else if (affiliationAndEmail.includes("Electronic address:")) {
+                        var affiliation = affiliationAndEmail.split('. Electronic address: ')
+                        author.affiliation = affiliation[0]
+                        if (affiliation[1].slice(-1) === '.') {
+                            author.email = affiliation[1].slice(0, affiliation[1].length - 1)
+                        } else author.email = affiliation[1]
+                    } else author.affiliation = authorsListInput[index - 1].AffiliationInfo.Affiliation
+                } else author.affiliation = "Not published"
                 article.authorsList.push(author)
             }
         } else {
@@ -199,10 +214,10 @@ function attributes_for_list_of_articles(publiListInput) {
 
         // mongoDbInsert(null, article)
         myGenericMongoClient.genericInsertOne('articles',
-        article,
-        function (err, res) {
-            res.send(article);
-        });
+            article,
+            function (err, res) {
+                res.send(article);
+            });
         console.log("Article with PMID " + article.pmid + " is successfully saved")
 
     }
