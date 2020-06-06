@@ -182,14 +182,20 @@ function attributes_for_list_of_articles(publiListInput) {
                 author.foreName = authorsListInput[index - 1].ForeName
                 // author.AffiliationInfo = authorsListInput[index - 1].AffiliationInfo
                 var affiliationInfoString = JSON.stringify(authorsListInput[index - 1].AffiliationInfo)
-                console.log("affiliationInfoString: " + affiliationInfoString + " is array: " + Array.isArray(affiliationInfoString))
-                // if (affiliationInfoString == undefined) {
-                //     return "Not available"
-               /* } else*/ if (affiliationInfoString.includes("Affiliation")) {
-                    var affiliationAndEmail = authorsListInput[index - 1].AffiliationInfo.Affiliation
-                    if (affiliationAndEmail == undefined) {
-                        return "Not available"
-                    } else if (affiliationAndEmail.includes("Electronic address:")) {
+               //console.log("affiliationInfoString: " + affiliationInfoString)
+                if (affiliationInfoString == undefined) {
+                    return "Not available"
+                } else if (affiliationInfoString.includes("Affiliation")) {
+                    //var affiliationAndEmail = authorsListInput[index - 1].AffiliationInfo.Affiliation
+                    // if (affiliationAndEmail == undefined) {
+                    //     return "Not available"
+                    // } else if (affiliationInfoString.includes("},{")){
+                    var affiliationAdress = affiliationInfoString.split('"Affiliation":"')
+                    author.affiliation1 = affiliationAdress[1]
+                    author.affiliation2 = affiliationAdress[2]
+                    //console.log("1: " + author.affiliation1 + " 2: " + author.affiliation2)
+                       
+                    if (affiliationAndEmail.includes("Electronic address:")) {
                         var affiliation = affiliationAndEmail.split('. Electronic address: ')
                         author.affiliation = affiliation[0]
                         if (affiliation[1].slice(-1) === '.') {
