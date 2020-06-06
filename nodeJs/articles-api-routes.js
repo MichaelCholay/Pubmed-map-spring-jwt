@@ -148,7 +148,7 @@ function attributes_for_list_of_articles(publiListInput) {
     console.log("***** " + publiListInput.length + " articles found with this request ******")
     //for (i in publiListInput) {
 
-    for (var i = 1; i <= publiListInput.length; i++) {
+    for (let i = 1; i <= publiListInput.length; i++) {
         var article = new Object()
         var medlineCitationPropertyListArticles = publiListInput[i - 1].MedlineCitation
         var articlePropertyListArticles = publiListInput[i - 1].MedlineCitation.Article
@@ -159,32 +159,51 @@ function attributes_for_list_of_articles(publiListInput) {
 
         if (medlineCitationPropertyListArticles.hasOwnProperty("DateCompleted")) {
             date = new Date(Date.UTC(medlineCitationPropertyListArticles.DateCompleted.Year, medlineCitationPropertyListArticles.DateCompleted.Month - 1, medlineCitationPropertyListArticles.DateCompleted.Day))
-        } else date = new Date(Date.UTC(articlePropertyListArticles.ArticleDate.Year, articlePropertyListArticles.ArticleDate.Month - 1, articlePropertyListArticles.ArticleDate.Day))
-        article.publicationDate = date.toLocaleDateString(undefined, optionDate)
+        } else {
+            date = new Date(Date.UTC(articlePropertyListArticles.ArticleDate.Year, articlePropertyListArticles.ArticleDate.Month - 1, articlePropertyListArticles.ArticleDate.Day))
+            console.log("no DateCompleted property")
+        }
+            article.publicationDate = date.toLocaleDateString(undefined, optionDate)
 
+        if (medlineCitationPropertyListArticles.hasOwnProperty("DateRevised")) {
         dateOfRevision = new Date(Date.UTC(medlineCitationPropertyListArticles.DateRevised.Year, medlineCitationPropertyListArticles.DateRevised.Month - 1, medlineCitationPropertyListArticles.DateRevised.Day))
         article.dateRevised = dateOfRevision.toLocaleDateString(undefined, optionDate)
+        } else {
+            article.dateRevised = "No revision date"
+            console.log("no DateRevised property")
+        }
 
-        article.abstract = articlePropertyListArticles.Abstract.AbstractText
+       // var abstractPropertyListArticles = articlePropertyListArticles.Abstract
+        if (articlePropertyListArticles.hasOwnProperty("Abstract")) {
+        article.abstract = articlePropertyListArticles.Abstract
+        } else {
+            article.abstract = "Not available"
+            console.log("no AbstractText property for " + article.pmid)
+        }
+
         article.pubmedURL = "https://pubmed.ncbi.nlm.nih.gov/" + article.pmid
 
         if (medlineCitationPropertyListArticles.hasOwnProperty("KeywordList")) {
             article.keywordsList = medlineCitationPropertyListArticles.KeywordList.Keyword
-        } else article.keywordsList = "Not available"
+        } else {
+            article.keywordsList = "No keyword"
+            console.log("No keyword")
+        }
 
         article.authorsList = []
         // authorsList_data_for_list_of_articles(publiListInput)
         var authorsListInput = articlePropertyListArticles.AuthorList.Author
         if (authorsListInput[0] != undefined) {
-            for (var index = 1; index <= authorsListInput.length; index++) {
+            for (let index = 1; index <= authorsListInput.length; index++) {
                 var author = new Object()
                 author.lastName = authorsListInput[index - 1].LastName
                 author.foreName = authorsListInput[index - 1].ForeName
                 // author.AffiliationInfo = authorsListInput[index - 1].AffiliationInfo
                 var affiliationInfoString = JSON.stringify(authorsListInput[index - 1].AffiliationInfo)
-               //console.log("affiliationInfoString: " + affiliationInfoString)
+                //console.log("affiliationInfoString: " + affiliationInfoString)
                 if (affiliationInfoString == undefined) {
-                    return "Not available"
+                    console.log("No affiliation")
+                    author.affiliation1 = "No affiliation"
                 } else if (affiliationInfoString.includes("Affiliation")) {
                     //var affiliationAndEmail = authorsListInput[index - 1].AffiliationInfo.Affiliation
                     // if (affiliationAndEmail == undefined) {
@@ -192,17 +211,28 @@ function attributes_for_list_of_articles(publiListInput) {
                     // } else if (affiliationInfoString.includes("},{")){
                     var affiliationAdress = affiliationInfoString.split('"Affiliation":"')
                     author.affiliation1 = affiliationAdress[1]
+                    if (author.affiliation1 != undefined) {
+                        if (author.affiliation1.includes("Electronic address:")) {
+                            var affiliation = ( author.affiliation1.split('. Electronic address: '))
+                            author.affiliation1 = affiliation[0]
+                            if (affiliation[1].slice(-1) === '.') {
+                                author.email = affiliation[1].slice(0, affiliation[1].length - 1)
+                            } else author.email = affiliation[1]
+                        }
+                    } else author.affiliation1 = affiliationAdress[1]
+                    
                     author.affiliation2 = affiliationAdress[2]
+                    if (author.affiliation2 != undefined) {
+                        if (author.affiliation2.includes("Electronic address:")) {
+                            var affiliation = ( author.affiliation2.split('. Electronic address: '))
+                            author.affiliation2 = affiliation[0]
+                            if (affiliation[1].slice(-1) === '.') {
+                                author.email = affiliation[1].slice(0, affiliation[1].length - 1)
+                            } else author.email = affiliation[1]
+                        }
+                    } else author.affiliation2 = affiliationAdress[2]
                     //console.log("1: " + author.affiliation1 + " 2: " + author.affiliation2)
-                       
-                    if (affiliationAndEmail.includes("Electronic address:")) {
-                        var affiliation = affiliationAndEmail.split('. Electronic address: ')
-                        author.affiliation = affiliation[0]
-                        if (affiliation[1].slice(-1) === '.') {
-                            author.email = affiliation[1].slice(0, affiliation[1].length - 1)
-                        } else author.email = affiliation[1]
-                    } else author.affiliation = authorsListInput[index - 1].AffiliationInfo.Affiliation
-                } else author.affiliation = "Not published"
+                }
                 article.authorsList.push(author)
             }
         } else {
