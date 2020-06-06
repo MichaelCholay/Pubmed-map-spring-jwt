@@ -73,12 +73,17 @@ function find_Pmid_bySearch_with_terms(term) {
         //console.log("requestText :" + request.responseText)
         if (request.status === 200) {
             var responseJs = JSON.parse(request.responseText)
+            var count = responseJs.esearchresult.count
+            if (count != 0) {
             var querykey = responseJs.esearchresult.querykey
             var webenv = responseJs.esearchresult.webenv
             console.log("querykey: " + querykey)
             console.log("webenv: " + webenv)
             console.log("idlist: " + responseJs.esearchresult.idlist)
             find_Article_Data_byFtech_with_PMID(querykey, webenv)
+            } else {
+                console.log("No result for this query")
+            }
         }
     }
 }
@@ -248,6 +253,9 @@ function attributes_for_list_of_articles(publiListInput) {
         // console.log("***** Find " + article.authorsList.length + " author(s) for this article *****")
         // console.log("author(s): " + JSON.stringify(article.authorsList, null, " "))
 
+        //replace_mongoId_byPmid(article)
+        //var publicationsList = [article]
+        //replace_mongoId_byPmid_inArray(publicationsList)
         // mongoDbInsert(null, article)
         myGenericMongoClient.genericInsertOne('articles',
             article,
@@ -299,37 +307,6 @@ function AuthorsList_data_for_one_article(responseJs) {
     // return authorsList
 }
 
-// recuperation des infos de chaque auteur pour chaque article de la requete
-//  for (var y = 0; y <= authorsListInput.length - 1; y++) {
-//      author.lastName = authorsListInput[y].LastName
-//      author.foreName = authorsListInput[y].ForeName
-//      author.AffiliationInfo = authorsListInput[y].AffiliationInfo
-//      var affiliationInfoString = JSON.stringify(authorsListInput[y].AffiliationInfo)
-// console.log(typeof affiliationInfoString)
-//var affiliationParsed= JSON.parse(affiliationInfoString)
-// if (author.AffiliationInfo == undefined){
-//     return "Undefined value !"
-// } else if (affiliationInfoString.includes("Affiliation")){
-//     var affiliationAndEmail = authorsListInput[y].AffiliationInfo.Affiliation
-//     if (affiliationAndEmail.includes("Electronic address:")){
-//         console.log("Affiliation and Email: " + affiliationAndEmail)
-//         var affiliation = affiliationAndEmail.split('. Electronic address: ')
-//         author.affiliation = affiliation[0]
-//         console.log("Affiliation: " + author.affiliation)
-//         // console.log("type: " + typeof affiliation[1])
-//         if (affiliation[1].slice(-1) === '.') {
-//             author.email = affiliation[1].slice(0, affiliation[1].length - 1)
-//         } else author.email = affiliation[1]
-//     } else author.affiliation = authorsListInput[y].AffiliationInfo.Affiliation
-// } else author.affiliation = "Not published"
-//  console.log("affiliationInfo: " + affiliationInfoString)
-//  console.log("Affiliation: " + author.affiliation)
-// console.log(author.email)
-//  authorsList.push(author)
-
-// console.log("author: " + JSON.stringify(author))
-
-/////////////////////////////////////////////////////
 
 // Conversion of xml results to Js object
 const removeJsonTextAttribute = function (value, parentElement) {
