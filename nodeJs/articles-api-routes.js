@@ -12,7 +12,7 @@ const optionDate = { year: "numeric", month: "2-digit", day: "2-digit" }
 
 // Replace mongoId by PMID
 function replace_mongoId_byPmid(article) {
-    article.pmid = article._id;
+    article._id = article.pmid;
     delete article._id;
     return article;
 }
@@ -21,7 +21,7 @@ function replace_mongoId_byPmid(article) {
 // Replace mongoId by PMID in ArrayList
 function replace_mongoId_byPmid_inArray(publicationArray) {
     for (i in publicationArray) {
-        replace_mongoId_byCode(publicationArray[i]);
+        replace_mongoId_byPmid(publicationArray[i]);
     }
     return publicationArray;
 }
@@ -30,7 +30,7 @@ function replace_mongoId_byPmid_inArray(publicationArray) {
 function findArticlesWithDateMini(articles, dateMini) {
     var selArticles = [];
     for (i in articles) {
-        if (articles[i].date >= dateMini) {
+        if (articles[i].dateRevised >= dateMini) {
             selArticles.push(articles[i]);
         }
     }
@@ -48,9 +48,9 @@ apiRouter.route('/article-api/public/article/:pmid')
             });
     });
 
-//exemple URL: http://localhost:9999/article-api/public/article (returning all articles)
-//             http://localhost:9999/article-api/public/article?dateMini=2010-01-01
-apiRouter.route('/article-api/public/article')
+//exemple URL: http://localhost:9999/article-api/public/articles (returning all articles)
+//             http://localhost:9999/article-api/public/articles?dateMini=2010-01-01
+apiRouter.route('/article-api/public/articles')
     .get(function (req, res, next) {
         var dateMini = req.query.dateMini;
         myGenericMongoClient.genericFindList('articles', {}, function (err, allArticle) {
