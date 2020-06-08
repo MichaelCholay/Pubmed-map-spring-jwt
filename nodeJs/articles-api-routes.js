@@ -30,7 +30,7 @@ function replace_mongoId_byPmid_inArray(publicationArray) {
 function findArticlesWithDateMini(articles, dateMini) {
     var selArticles = [];
     for (i in articles) {
-        if (articles[i].dateRevised >= dateMini) {
+        if (articles[i].revisionDate >= dateMini) {
             selArticles.push(articles[i]);
         }
     }
@@ -138,9 +138,9 @@ function attributes_for_one_article(responseJs) {
     article.publicationDate = date.toLocaleDateString(undefined, optionDate)
 
     dateOfRevision = new Date(Date.UTC(medlineCitationPropertyOneArticle.DateRevised.Year, medlineCitationPropertyOneArticle.DateRevised.Month - 1, medlineCitationPropertyOneArticle.DateRevised.Day))
-    article.dateRevised = dateOfRevision.toLocaleDateString(undefined, optionDate)
+    article.revisionDate = dateOfRevision.toLocaleDateString(undefined, optionDate)
 
-    article.abstractArticle = articlePropertyOneArticle.Abstract.AbstractText
+    article.articleAbstract = articlePropertyOneArticle.Abstract.AbstractText
     article.pubmedURL = "https://pubmed.ncbi.nlm.nih.gov/" + article.pmid
 
     if (medlineCitationPropertyOneArticle.hasOwnProperty("KeywordList")) {
@@ -175,17 +175,17 @@ function attributes_for_list_of_articles(publiListInput) {
 
         if (medlineCitationPropertyListArticles.hasOwnProperty("DateRevised")) {
             dateOfRevision = new Date(Date.UTC(medlineCitationPropertyListArticles.DateRevised.Year, medlineCitationPropertyListArticles.DateRevised.Month - 1, medlineCitationPropertyListArticles.DateRevised.Day))
-            article.dateRevised = dateOfRevision.toLocaleDateString(undefined, optionDate)
         } else {
-            article.dateRevised = "No revision date"
+            dateOfRevision = "No revision date"
             console.log("no DateRevised property for " + article.pmid)
         }
+        article.revisionDate = dateOfRevision.toLocaleDateString(undefined, optionDate)
 
         // var abstractPropertyListArticles = articlePropertyListArticles.Abstract
         if (articlePropertyListArticles.hasOwnProperty("Abstract")) {
-            article.abstractArticle = articlePropertyListArticles.Abstract
+            article.articleAbstract = articlePropertyListArticles.Abstract
         } else {
-            article.abstractArticle = "Not available"
+            article.articleAbstract = "Not available"
             console.log("no AbstractText property for " + article.pmid)
         }
 
