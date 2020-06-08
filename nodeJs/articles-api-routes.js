@@ -62,6 +62,9 @@ apiRouter.route('/article-api/public/articles')
         });
     });
 
+    // http://localhost:9999/article-api/public/articles?country=France
+    // A FAIRE SI POSSIBLE
+
 
 // Get pmid list for articles with search of pubmed-api
 function find_Pmid_bySearch_with_terms(term) {
@@ -137,7 +140,7 @@ function attributes_for_one_article(responseJs) {
     dateOfRevision = new Date(Date.UTC(medlineCitationPropertyOneArticle.DateRevised.Year, medlineCitationPropertyOneArticle.DateRevised.Month - 1, medlineCitationPropertyOneArticle.DateRevised.Day))
     article.dateRevised = dateOfRevision.toLocaleDateString(undefined, optionDate)
 
-    article.abstract = articlePropertyOneArticle.Abstract.AbstractText
+    article.abstractArticle = articlePropertyOneArticle.Abstract.AbstractText
     article.pubmedURL = "https://pubmed.ncbi.nlm.nih.gov/" + article.pmid
 
     if (medlineCitationPropertyOneArticle.hasOwnProperty("KeywordList")) {
@@ -180,9 +183,9 @@ function attributes_for_list_of_articles(publiListInput) {
 
         // var abstractPropertyListArticles = articlePropertyListArticles.Abstract
         if (articlePropertyListArticles.hasOwnProperty("Abstract")) {
-            article.abstract = articlePropertyListArticles.Abstract
+            article.abstractArticle = articlePropertyListArticles.Abstract
         } else {
-            article.abstract = "Not available"
+            article.abstractArticle = "Not available"
             console.log("no AbstractText property for " + article.pmid)
         }
 
