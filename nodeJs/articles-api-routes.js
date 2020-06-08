@@ -141,7 +141,7 @@ function attributes_for_one_article(responseJs) {
     article.revisionDate = dateOfRevision.toLocaleDateString(undefined, optionDate)
 
     article.articleAbstract = articlePropertyOneArticle.Abstract.AbstractText
-    article.pubmedURL = "https://pubmed.ncbi.nlm.nih.gov/" + article.pmid
+    article.pubmedUrl = "https://pubmed.ncbi.nlm.nih.gov/" + article.pmid
 
     if (medlineCitationPropertyOneArticle.hasOwnProperty("KeywordList")) {
         article.keywordsList = medlineCitationPropertyOneArticle.KeywordList.Keyword
@@ -189,7 +189,7 @@ function attributes_for_list_of_articles(publiListInput) {
             console.log("no AbstractText property for " + article.pmid)
         }
 
-        article.pubmedURL = "https://pubmed.ncbi.nlm.nih.gov/" + article.pmid
+        article.pubmedUrl = "https://pubmed.ncbi.nlm.nih.gov/" + article.pmid
 
         if (medlineCitationPropertyListArticles.hasOwnProperty("KeywordList")) {
             article.keywordsList = medlineCitationPropertyListArticles.KeywordList.Keyword
