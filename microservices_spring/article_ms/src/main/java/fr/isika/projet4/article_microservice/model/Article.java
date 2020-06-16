@@ -1,17 +1,19 @@
 package fr.isika.projet4.article_microservice.model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
-@Document(collection = "articles")
+//@Document(collection = "articles")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Article {
 
-	@Id
-	private ObjectId _id;
+//	@Id
+//	private ObjectId _id;
 	
 	private Long pmid;
 
@@ -23,49 +25,54 @@ public class Article {
 
 	private LocalDate revisionDate;
 
-	private String articleAbstract;
+	//private String[] articleAbstract;
 
 	private String pubmedUrl;
+	
+//	private String[] keywordsList;
+	
+	private Author[] authorsList;
 
-	private List<Document> keywords;
-
-	private List<String> authors;
+	
 
 	////////// Constructors \\\\\\\\\\
 
-	public Article() {
-		super();
-	}
-
-	public Article(Long pmid, String articleTitle, String journal, LocalDate publicationDate, LocalDate revisionDate,
-			String articleAbstract, String pubmedUrl, List<Document> keywords, List<String> authors) {
-		super();
-		this.pmid = pmid;
-		this.articleTitle = articleTitle;
-		this.journal = journal;
-		this.publicationDate = publicationDate;
-		this.revisionDate = revisionDate;
-		this.articleAbstract = articleAbstract;
-		this.pubmedUrl = pubmedUrl;
-		this.keywords = keywords;
-		this.authors = authors;
-	}
+//	public Article() {
+//		super();
+//	}
+//
+//	public Article(Long pmid, String articleTitle, String journal, LocalDate publicationDate, LocalDate revisionDate,
+//			List<String> articleAbstract, String pubmedUrl, String[] keywords, List<Author> authors) {
+//		super();
+//		this.pmid = pmid;
+//		this.articleTitle = articleTitle;
+//		this.journal = journal;
+//		this.publicationDate = publicationDate;
+//		this.revisionDate = revisionDate;
+//		this.articleAbstract = articleAbstract;
+//		this.pubmedUrl = pubmedUrl;
+//		this.keywords = keywords;
+//		this.authors = authors;
+//	}
 
 	////////// toString \\\\\\\\\\
 
 	@Override
 	public String toString() {
 		return "Article [pmid=" + pmid + ", articleTitle=" + articleTitle + ", journal=" + journal
-				+ ", publicationDate=" + publicationDate + ", revisionDate=" + revisionDate + ", articleAbstract="
-				+ articleAbstract + ", pubmedUrl=" + pubmedUrl + ", keywords=" + keywords + ", authors=" + authors
-				+ "]";
+				+ ", publicationDate=" + publicationDate + ", revisionDate=" + revisionDate + ", pubmedUrl=" + pubmedUrl
+				+ ", authorsList=" + Arrays.toString(authorsList) + "]";
 	}
+	
+	
+	
 
 	////////// Getters-setters \\\\\\\\\\
 
 	public Long getPmid() {
 		return pmid;
 	}
+
 
 	public void setPmid(Long pmid) {
 		this.pmid = pmid;
@@ -103,13 +110,13 @@ public class Article {
 		this.revisionDate = revisionDate;
 	}
 
-	public String getArticleAbstract() {
-		return articleAbstract;
-	}
-
-	public void setArticleAbstract(String articleAbstract) {
-		this.articleAbstract = articleAbstract;
-	}
+//	public String[] getArticleAbstract() {
+//		return articleAbstract;
+//	}
+//
+//	public void setArticleAbstract(String[] articleAbstract) {
+//		this.articleAbstract = articleAbstract;
+//	}
 
 	public String getPubmedUrl() {
 		return pubmedUrl;
@@ -119,19 +126,22 @@ public class Article {
 		this.pubmedUrl = pubmedUrl;
 	}
 
-	public List<Document> getKeywords() {
-		return keywords;
+//	public String[] getKeywords() {
+//		return keywordsList;
+//	}
+//
+//	public void setKeywords(String[] keywords) {
+//		this.keywordsList = keywords;
+//	}
+
+	public Author[] getAuthors() {
+		return authorsList;
 	}
 
-	public void setKeywords(List<Document> keywords) {
-		this.keywords = keywords;
+	public void setAuthors(Author[] authors) {
+		this.authorsList = authors;
 	}
 
-	public List<String> getAuthors() {
-		return authors;
-	}
 
-	public void setAuthors(List<String> authors) {
-		this.authors = authors;
-	}
+	
 }
