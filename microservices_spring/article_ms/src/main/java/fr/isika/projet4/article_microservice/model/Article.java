@@ -37,23 +37,21 @@ public class Article {
 
 	////////// Constructors \\\\\\\\\\
 
-//	public Article() {
-//		super();
-//	}
-//
-//	public Article(Long pmid, String articleTitle, String journal, LocalDate publicationDate, LocalDate revisionDate,
-//			List<String> articleAbstract, String pubmedUrl, String[] keywords, List<Author> authors) {
-//		super();
-//		this.pmid = pmid;
-//		this.articleTitle = articleTitle;
-//		this.journal = journal;
-//		this.publicationDate = publicationDate;
-//		this.revisionDate = revisionDate;
-//		this.articleAbstract = articleAbstract;
-//		this.pubmedUrl = pubmedUrl;
-//		this.keywords = keywords;
-//		this.authors = authors;
-//	}
+	public Article() {
+		super();
+	}
+
+	public Article(Long pmid, String articleTitle, String journal, LocalDate publicationDate, LocalDate revisionDate,
+			String pubmedUrl, Author[] authorsList) {
+		super();
+		this.pmid = pmid;
+		this.articleTitle = articleTitle;
+		this.journal = journal;
+		this.publicationDate = publicationDate;
+		this.revisionDate = revisionDate;
+		this.pubmedUrl = pubmedUrl;
+		this.authorsList = authorsList;
+	}
 
 	////////// toString \\\\\\\\\\
 

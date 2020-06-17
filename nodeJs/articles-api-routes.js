@@ -1,6 +1,6 @@
 var express = require('express');
 const apiRouter = express.Router();
-const got = require('got');
+//const got = require('got');
 fs = require('fs');
 var convert = require('xml-js');
 var app = express();
@@ -192,7 +192,14 @@ function attributes_for_list_of_articles(publiListInput) {
         article.pubmedUrl = "https://pubmed.ncbi.nlm.nih.gov/" + article.pmid
 
         if (medlineCitationPropertyListArticles.hasOwnProperty("KeywordList")) {
-            article.keywordsList = medlineCitationPropertyListArticles.KeywordList.Keyword
+             keywordsList = medlineCitationPropertyListArticles.KeywordList.Keyword
+            //  for (let i in keywordsList){
+            //     article.keywordsList.
+            //  }
+            //  article.keywordsList
+            ///////////////METTRE CHAQUE KEYWORDS DANS LIST STRING ????//////////////////////////////
+            // console.log("key1: " + article.keywordsList[0])
+            //////////////////////////////////////////////
         } else {
             article.keywordsList = "No keyword"
             console.log("No keyword for " + article.pmid)

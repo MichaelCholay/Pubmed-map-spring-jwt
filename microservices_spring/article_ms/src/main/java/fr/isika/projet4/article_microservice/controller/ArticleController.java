@@ -4,6 +4,8 @@ import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,9 +21,9 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.google.gson.reflect.TypeToken;
 
 import fr.isika.projet4.article_microservice.model.Article;
-import fr.isika.projet4.article_microservice.model.Articles;
 import fr.isika.projet4.article_microservice.repository.ArticleRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,6 +33,7 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping(path = "/article-api/public")
 public class ArticleController {
 	
+	Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private ArticleRepository articleRepo;
@@ -54,7 +57,7 @@ public class ArticleController {
 	WebClient webClient = WebClient.create();
 
 	@GetMapping(path = "/articles")
-	private Article[] getAllArticles() {
+	private List<Article> getAllArticles() {
 	 final String uri = "http://localhost:9999/article-api/public/articles";
 
 //		URL url = new URL("http://localhost:9999/article-api/public/articles");
@@ -81,9 +84,17 @@ public class ArticleController {
                 return LocalDate.parse(json.getAsJsonPrimitive().getAsString());
             }
         }).create();
-	    Article[] articleArray = gson.fromJson(result, Article[].class);
-	    System.out.println("Gson : " + articleArray.toString());
-	    return articleArray;
+	    // convert JSON string to Java array
+//	    Article[] articleArray = gson.fromJson(result, Article[].class);
+//	    for (int i=0; i < articleArray.length; i++) {
+//	    log.info("Article " + (i+1) + " / " + articleArray.length + ": "+ articleArray[i]);
+//	    }
+//	    return articleArray;
+	    
+	 // convert JSON string to Java list
+	    List<Article> articles = gson.fromJson(result, new TypeToken<List<Article>>() {}.getType());
+	    articles.forEach(System.out::println);
+	    return articles;
 
 	// WebCLient String
 //	@GetMapping(path = "/articles")
