@@ -1,9 +1,9 @@
 var express = require('express');
 const apiRouter = express.Router();
 //const got = require('got');
-fs = require('fs');
+//fs = require('fs');
 var convert = require('xml-js');
-var app = express();
+//var app = express();
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 var myGenericMongoClient = require('./my_generic_mongo_client');
@@ -109,6 +109,7 @@ function find_Article_Data_byFtech_with_PMID(querykey, webenv) {
         console.log("requestSatus :" + request.status)
         if (request.status === 200) {
             responseJs = convert.xml2js(request.responseText, options)
+            console.log(JSON.stringify(responseJs))
             var publiListInput = responseJs.PubmedArticleSet.PubmedArticle
             //    console.log("publiListInput: " + JSON.stringify(publiListInput, null, " "))
             if (publiListInput.length === undefined) {
@@ -183,7 +184,11 @@ function attributes_for_list_of_articles(publiListInput) {
 
         // var abstractPropertyListArticles = articlePropertyListArticles.Abstract
         if (articlePropertyListArticles.hasOwnProperty("Abstract")) {
-            article.articleAbstract = articlePropertyListArticles.Abstract
+            if (Array.isArray(articlePropertyListArticles.Abstract.AbstractText)){
+                article.articleAbstract = articlePropertyListArticles.Abstract.AbstractText.join(" ")
+            }
+            else article.articleAbstract = articlePropertyListArticles.Abstract.AbstractText
+            //console.log(Array.isArray(articlePropertyListArticles.Abstract.AbstractText))
         } else {
             article.articleAbstract = "Not available"
             console.log("no AbstractText property for " + article.pmid)

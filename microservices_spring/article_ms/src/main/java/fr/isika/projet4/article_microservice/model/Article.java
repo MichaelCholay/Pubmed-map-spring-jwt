@@ -25,7 +25,7 @@ public class Article {
 
 	private LocalDate revisionDate;
 
-	//private List<String> articleAbstract;
+	private String articleAbstract;
 
 	private String pubmedUrl;
 	
@@ -58,8 +58,8 @@ public class Article {
 	@Override
 	public String toString() {
 		return "Article [pmid=" + pmid + ", articleTitle=" + articleTitle + ", journal=" + journal
-				+ ", publicationDate=" + publicationDate + ", revisionDate=" + revisionDate + ", pubmedUrl=" + pubmedUrl
-				+ ", authorsList=" + authorsList + "]";
+				+ ", publicationDate=" + publicationDate + ", revisionDate=" + revisionDate + ", articleAbstract="
+				+ articleAbstract + ", pubmedUrl=" + pubmedUrl + ", authorsList=" + authorsList + "]";
 	}
 	
 	
@@ -108,13 +108,13 @@ public class Article {
 		this.revisionDate = revisionDate;
 	}
 
-//	public List<String> getArticleAbstract() {
-//		return articleAbstract;
-//	}
-//
-//	public void setArticleAbstract(List<String> articleAbstract) {
-//		this.articleAbstract = articleAbstract;
-//	}
+	public String getArticleAbstract() {
+		return articleAbstract;
+	}
+
+	public void setArticleAbstract(String articleAbstract) {
+		this.articleAbstract = articleAbstract;
+	}
 
 	public String getPubmedUrl() {
 		return pubmedUrl;
