@@ -197,14 +197,10 @@ function attributes_for_list_of_articles(publiListInput) {
         article.pubmedUrl = "https://pubmed.ncbi.nlm.nih.gov/" + article.pmid
 
         if (medlineCitationPropertyListArticles.hasOwnProperty("KeywordList")) {
-             keywordsList = medlineCitationPropertyListArticles.KeywordList.Keyword
-            //  for (let i in keywordsList){
-            //     article.keywordsList.
-            //  }
-            //  article.keywordsList
-            ///////////////METTRE CHAQUE KEYWORDS DANS LIST STRING ????//////////////////////////////
-            // console.log("key1: " + article.keywordsList[0])
-            //////////////////////////////////////////////
+            if (Array.isArray(medlineCitationPropertyListArticles.KeywordList.Keyword)){
+                article.keywordsList = medlineCitationPropertyListArticles.KeywordList.Keyword.join(", ")
+            }
+            else article.keywordsList = medlineCitationPropertyListArticles.KeywordList.Keyword
         } else {
             article.keywordsList = "No keyword"
             console.log("No keyword for " + article.pmid)

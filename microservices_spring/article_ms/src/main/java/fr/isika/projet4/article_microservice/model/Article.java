@@ -29,7 +29,7 @@ public class Article {
 
 	private String pubmedUrl;
 	
-//	private String[] keywordsList;
+	private String keywordsList;
 	
 	private List<Author> authorsList;
 
@@ -59,7 +59,8 @@ public class Article {
 	public String toString() {
 		return "Article [pmid=" + pmid + ", articleTitle=" + articleTitle + ", journal=" + journal
 				+ ", publicationDate=" + publicationDate + ", revisionDate=" + revisionDate + ", articleAbstract="
-				+ articleAbstract + ", pubmedUrl=" + pubmedUrl + ", authorsList=" + authorsList + "]";
+				+ articleAbstract + ", pubmedUrl=" + pubmedUrl + ", keywordsList=" + keywordsList + ", authorsList="
+				+ authorsList + "]";
 	}
 	
 	
@@ -132,13 +133,14 @@ public class Article {
 		this.authorsList = authorsList;
 	}
 
-//	public String[] getKeywords() {
-//		return keywordsList;
-//	}
-//
-//	public void setKeywords(String[] keywords) {
-//		this.keywordsList = keywords;
-//	}
+	public String getKeywordsList() {
+		return keywordsList;
+	}
+
+	public void setKeywordsList(String keywordsList) {
+		this.keywordsList = keywordsList;
+	}
+
 
 
 
