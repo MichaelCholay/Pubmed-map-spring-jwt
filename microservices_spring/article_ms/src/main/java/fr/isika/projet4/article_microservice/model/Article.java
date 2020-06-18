@@ -25,13 +25,13 @@ public class Article {
 
 	private LocalDate revisionDate;
 
-	//private String[] articleAbstract;
+	//private List<String> articleAbstract;
 
 	private String pubmedUrl;
 	
 //	private String[] keywordsList;
 	
-	private Author[] authorsList;
+	private List<Author> authorsList;
 
 	
 
@@ -41,17 +41,17 @@ public class Article {
 		super();
 	}
 
-	public Article(Long pmid, String articleTitle, String journal, LocalDate publicationDate, LocalDate revisionDate,
-			String pubmedUrl, Author[] authorsList) {
-		super();
-		this.pmid = pmid;
-		this.articleTitle = articleTitle;
-		this.journal = journal;
-		this.publicationDate = publicationDate;
-		this.revisionDate = revisionDate;
-		this.pubmedUrl = pubmedUrl;
-		this.authorsList = authorsList;
-	}
+//	public Article(Long pmid, String articleTitle, String journal, LocalDate publicationDate, LocalDate revisionDate,
+//			String pubmedUrl, List<Author> authorsList) {
+//		super();
+//		this.pmid = pmid;
+//		this.articleTitle = articleTitle;
+//		this.journal = journal;
+//		this.publicationDate = publicationDate;
+//		this.revisionDate = revisionDate;
+//		this.pubmedUrl = pubmedUrl;
+//		this.authorsList = authorsList;
+//	}
 
 	////////// toString \\\\\\\\\\
 
@@ -59,7 +59,7 @@ public class Article {
 	public String toString() {
 		return "Article [pmid=" + pmid + ", articleTitle=" + articleTitle + ", journal=" + journal
 				+ ", publicationDate=" + publicationDate + ", revisionDate=" + revisionDate + ", pubmedUrl=" + pubmedUrl
-				+ ", authorsList=" + Arrays.toString(authorsList) + "]";
+				+ ", authorsList=" + authorsList + "]";
 	}
 	
 	
@@ -108,11 +108,11 @@ public class Article {
 		this.revisionDate = revisionDate;
 	}
 
-//	public String[] getArticleAbstract() {
+//	public List<String> getArticleAbstract() {
 //		return articleAbstract;
 //	}
 //
-//	public void setArticleAbstract(String[] articleAbstract) {
+//	public void setArticleAbstract(List<String> articleAbstract) {
 //		this.articleAbstract = articleAbstract;
 //	}
 
@@ -124,6 +124,14 @@ public class Article {
 		this.pubmedUrl = pubmedUrl;
 	}
 
+	public List<Author> getAuthorsList() {
+		return authorsList;
+	}
+
+	public void setAuthorsList(List<Author> authorsList) {
+		this.authorsList = authorsList;
+	}
+
 //	public String[] getKeywords() {
 //		return keywordsList;
 //	}
@@ -132,13 +140,7 @@ public class Article {
 //		this.keywordsList = keywords;
 //	}
 
-	public Author[] getAuthors() {
-		return authorsList;
-	}
 
-	public void setAuthors(Author[] authors) {
-		this.authorsList = authors;
-	}
 
 
 	

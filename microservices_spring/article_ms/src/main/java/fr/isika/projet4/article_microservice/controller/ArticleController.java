@@ -7,6 +7,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,7 @@ import fr.isika.projet4.article_microservice.model.Article;
 import fr.isika.projet4.article_microservice.repository.ArticleRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import reactor.core.publisher.Flux;
 
 @Api("APi for CRUD operations of article")
 @RestController
@@ -54,10 +56,10 @@ public class ArticleController {
 //		return articlesList;
 //	}
 
-	WebClient webClient = WebClient.create();
+	private WebClient client = WebClient.create("http://localhost:9999");
 
 	@GetMapping(path = "/articles")
-	private List<Article> getAllArticles() {
+	private Flux<Article> getAllArticles() {
 	 final String uri = "http://localhost:9999/article-api/public/articles";
 
 //		URL url = new URL("http://localhost:9999/article-api/public/articles");
@@ -65,9 +67,9 @@ public class ArticleController {
 //		con.setRequestMethod("GET");
 
 	// RestTemplate String
-	    RestTemplate restTemplate = new RestTemplate();
-	    String result = restTemplate.getForObject(uri, String.class);
-	    System.out.println("StringJson: " + result);
+//	    RestTemplate restTemplate = new RestTemplate();
+//	    String result = restTemplate.getForObject(uri, String.class);
+//	    System.out.println("StringJson: " + result);
 //	    return result;
 
 	// RestTemplate String with HttpHeaders
@@ -78,12 +80,13 @@ public class ArticleController {
 	
 	//Gson
 	    //Gson gson = new Gson();
-	    final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDate.class, new JsonDeserializer<LocalDate>() {
-            @Override
-            public LocalDate deserialize(JsonElement json, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-                return LocalDate.parse(json.getAsJsonPrimitive().getAsString());
-            }
-        }).create();
+//	    final Gson gson = new GsonBuilder().registerTypeAdapter(LocalDate.class, new JsonDeserializer<LocalDate>() {
+//            @Override
+//            public LocalDate deserialize(JsonElement json, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+//                return LocalDate.parse(json.getAsJsonPrimitive().getAsString());
+//            }
+//        }).create();
+	    
 	    // convert JSON string to Java array
 //	    Article[] articleArray = gson.fromJson(result, Article[].class);
 //	    for (int i=0; i < articleArray.length; i++) {
@@ -92,15 +95,19 @@ public class ArticleController {
 //	    return articleArray;
 	    
 	 // convert JSON string to Java list
-	    List<Article> articles = gson.fromJson(result, new TypeToken<List<Article>>() {}.getType());
-	    articles.forEach(System.out::println);
-	    return articles;
+//	    List<Article> articles = gson.fromJson(result, new TypeToken<List<Article>>() {}.getType());
+//	    articles.forEach(System.out::println);
+//	    return articles;
 
-	// WebCLient String
-//	@GetMapping(path = "/articles")
-//	public Flux<ArticlesList> listArticles() {
-//		return webClient.get().uri("http://localhost:9999/article-api/public/articles").retrieve().bodyToFlux(ArticlesList.class);
+	// WebCLient
+	 	return client.get()
+				.uri("/article-api/public/articles")
+				.accept(MediaType.APPLICATION_JSON)
+				.retrieve()
+				.bodyToFlux(Article.class)
+				.log();
 	}
+	
 
 	@ApiOperation(value = "Find aticles by title")
 	public @ResponseBody List<Article> findArticleTitleLike(@PathVariable String articleTitle) {

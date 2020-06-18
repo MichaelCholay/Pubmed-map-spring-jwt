@@ -18,8 +18,11 @@ public class Author {
 	private String email;
 	
 	
-	
-	
+	////////// Constructors \\\\\\\\\\
+
+	public Author() {
+		super();
+	}
 
 	public Author(String lastName, String foreName, String affiliation1, String affiliation2, String email) {
 		super();
@@ -30,8 +33,7 @@ public class Author {
 		this.email = email;
 	}
 	
-	
-	
+	////////// toString \\\\\\\\\\
 
 	@Override
 	public String toString() {
@@ -39,7 +41,7 @@ public class Author {
 				+ ", affiliation2=" + affiliation2 + ", email=" + email + "]";
 	}
 
-
+	////////// toString \\\\\\\\\\
 
 
 	public String getLastName() {
