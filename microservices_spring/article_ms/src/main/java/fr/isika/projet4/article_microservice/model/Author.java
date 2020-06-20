@@ -11,9 +11,9 @@ public class Author {
 	
 	private String foreName;
 	
-	private String affiliation1;
+	private Affiliation affiliation1;
 	
-	private String affiliation2;
+	private Affiliation affiliation2;
 	
 	private String email;
 	
@@ -23,8 +23,8 @@ public class Author {
 	public Author() {
 		super();
 	}
-
-	public Author(String lastName, String foreName, String affiliation1, String affiliation2, String email) {
+	
+	public Author(String lastName, String foreName, Affiliation affiliation1, Affiliation affiliation2, String email) {
 		super();
 		this.lastName = lastName;
 		this.foreName = foreName;
@@ -32,7 +32,7 @@ public class Author {
 		this.affiliation2 = affiliation2;
 		this.email = email;
 	}
-	
+
 	////////// toString \\\\\\\\\\
 
 	@Override
@@ -41,7 +41,7 @@ public class Author {
 				+ ", affiliation2=" + affiliation2 + ", email=" + email + "]";
 	}
 
-	////////// toString \\\\\\\\\\
+	////////// Getters - Setters \\\\\\\\\\
 
 
 	public String getLastName() {
@@ -60,19 +60,19 @@ public class Author {
 		this.foreName = foreName;
 	}
 
-	public String getAffiliation1() {
+	public Affiliation getAffiliation1() {
 		return affiliation1;
 	}
 
-	public void setAffiliation1(String affiliation1) {
+	public void setAffiliation1(Affiliation affiliation1) {
 		this.affiliation1 = affiliation1;
 	}
 
-	public String getAffiliation2() {
+	public Affiliation getAffiliation2() {
 		return affiliation2;
 	}
 
-	public void setAffiliation2(String affiliation2) {
+	public void setAffiliation2(Affiliation affiliation2) {
 		this.affiliation2 = affiliation2;
 	}
 
