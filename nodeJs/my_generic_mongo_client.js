@@ -49,6 +49,18 @@ var genericUpdateOne = function (collectionName, id, changes, callback_with_err_
 	});
 };
 
+var genericUpsertOne = function (collectionName, id, changes, callback_with_err_and_results) {
+	executeInMongoDbConnection(function (db) {
+		db.collection(collectionName).updateOne({ '_id': id }, { $set: changes }, {upsert: true},
+			function (err, results) {
+				if (err != null) {
+					console.log("genericUpdateOne error = " + err);
+				}
+				callback_with_err_and_results(err, results);
+			});
+	});
+};
+
 // var genericInsertOne = function (collectionName, newOne, callback_with_err_and_newId) {
 // 	executeInMongoDbConnection(function (db) {
 // 		db.collection(collectionName).insertOne(newOne, function (err, result) {
