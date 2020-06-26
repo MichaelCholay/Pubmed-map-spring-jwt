@@ -37,9 +37,9 @@ var executeInMongoDbConnection = function (callback_with_db) {
 	}
 }
 
-var genericUpdateOne = function (collectionName, id, changes, callback_with_err_and_results) {
+var genericUpdateOne = function (collectionName, id, changes, arrayFilters, callback_with_err_and_results) {
 	executeInMongoDbConnection(function (db) {
-		db.collection(collectionName).updateOne({ '_id': id }, { $set: changes },
+		db.collection(collectionName).updateOne({ '_id': id }, { $set: changes }, {arrayFilters},
 			function (err, results) {
 				if (err != null) {
 					console.log("genericUpdateOne error = " + err);
@@ -54,7 +54,7 @@ var genericUpsertOne = function (collectionName, id, changes, callback_with_err_
 		db.collection(collectionName).updateOne({ '_id': id }, { $set: changes }, {upsert: true},
 			function (err, results) {
 				if (err != null) {
-					console.log("genericUpdateOne error = " + err);
+					console.log("genericUpsertOne error = " + err);
 				}
 				callback_with_err_and_results(err, results);
 			});
@@ -132,6 +132,7 @@ var genericFindOne = function (collectionName, query, callback_with_err_and_item
 };
 
 exports.genericUpdateOne = genericUpdateOne;
+exports.genericUpsertOne = genericUpsertOne;
 exports.genericInsertOne = genericInsertOne;
 exports.genericFindList = genericFindList;
 exports.genericFindOne = genericFindOne;

@@ -62,6 +62,20 @@ apiRouter.route('/article-api/public/articles')
         });
     });
 
+// exemple URL: http://localhost:9999/article-api/public/geoloc (returning all geoloc)
+//             http://localhost:9999/article-api/public/articles?dateMini=2010-01-01
+apiRouter.route('/article-api/public/geoloc')
+    .get(function (req, res, next) {
+        var dateMini = req.query.dateMini;
+        myGenericMongoClient.genericFindList('geoloc', {}, function (err, allGeoloc) {
+            if (dateMini) {
+                res.send(replace_mongoId_byPmid_inArray(findArticlesWithDateMini(allGeoloc, dateMini)));
+            } else {
+                res.send(replace_mongoId_byPmid_inArray(allGeoloc));
+            }
+        });
+    });
+
 // http://localhost:9999/article-api/public/articles?country=France
 // A FAIRE SI POSSIBLE
 
@@ -243,9 +257,15 @@ function attributes_for_list_of_articles(publiListInput) {
                         //////////// geocoding \\\\\\\\\\\\\\
 
                         // affiliation1.formatedAddress = geocoding(affiliation1.affiliationPubmed).formatedAddress
-                        // affiliation1.latitute = geocoding(affiliation1.affiliationPubmed).latitute
+                        // affiliation1.latitude = geocoding(affiliation1.affiliationPubmed).latitude
                         // affiliation1.longitude = geocoding(affiliation1.affiliationPubmed).longitude
+
+
+
                         var affPubmed = affiliation1.affiliationPubmed
+                        affiliation1.latitude = "Not determined";
+                        affiliation1.longitude = "";
+
                         console.log("affPubmed: " + affPubmed + typeof (affPubmed))
                         // let {latitude, longitude}  = geocoding(affPubmed)
                         mapsApiKey = 'AIzaSyCmLt2lwBI0uLNbd8V7boG56frwEfS-QuU'
@@ -257,197 +277,218 @@ function attributes_for_list_of_articles(publiListInput) {
                         geocodeRequest.onload = function () {
                             //  if (geocodeRequest.status === 200) {
                             var geocodeResponse = JSON.parse(geocodeRequest.responseText)
-                           // formatedAddress = geocodeRequest.results[0].formatted_address
-                            latitude = geocodeResponse.results[0].geometry.location.lat
-                            longitude = geocodeResponse.results[0].geometry.location.lng
-                           // console.log("latitude: " + formatedAddress)
-                           // }
+                            var geoloc = new Object()
+                            // formatedAddress = geocodeRequest.results[0].formatted_address
+                            geoloc.pmid = article.pmid
+                            geoloc.latitude = geocodeResponse.results[0].geometry.location.lat
+                            geoloc.longitude = geocodeResponse.results[0].geometry.location.lng
+                            // console.log("latitude: " + latitude)
+
+                            // myGenericMongoClient.genericFindOne('articles', {"pmid": article.pmid},
+                            // function (err, res){
+                            //console.log("find: " + JSON.stringify(res))
+                            // myGenericMongoClient.genericUpdateOne('articles', {},
+                            //     /*{"authorsList.affiliationList.latitude" : ""},*/
+                            //     {
+                            //         "$set": {
+                            //             "authorsList.affiliationList.$[elem].latitude": "12", //geocodeResponse.results[0].geometry.location.lat,
+                            //             // "authorsList.affiliationList.$[elem].longitude": "12"//longitude: geocodeResponse.results[0].geometry.location.lng
+                            //         }
+                            //     },
+                            //     { "arrayFilters": [{ "elem.latitude": "Not determined" }], "multi": true },
+                            //     function (err, res) {
+                            //         if (err) throw err;
+                            //         // console.log(res.upsertedCount)                                });
+                            //     })
+                            //    }
+                            myGenericMongoClient.genericInsertOne('geoloc', geoloc,  function (err, res) {
+                                res.send(article);
+                            });
+                        console.log(`geoloc: ${geoloc.pmid} - ${geoloc.author.lastName} - - ${geoloc.latitude} - ${geoloc.longitude}`)
                         }
+                        // console.log("test: " + geocodeResponse.results[0].geometry.location.lat)
+                        // affiliation1.latitude = 
+                        // console.log("latitude: " + latitude)
+                        // console.log("longitude: " + affiliation1.longitude)
+                        //console.log("aff: " + JSON.stringify(formatedAddress))
 
-                        affiliation1. = geocodeRequest.latitude
-                        console.log("latitude: " + affiliation1.latitude)
-                        console.log("longitude: " + affiliation1.longitude)
-                            //console.log("aff: " + JSON.stringify(formatedAddress))
+                        author.affiliationList.push(affiliation1)
 
-                            author.affiliationList.push(affiliation1)
-
-                            author.affiliation2 = affiliationAdress[2]
-                            if (author.affiliation2 != undefined) {
-                                if (author.affiliation2.includes("Electronic address:")) {
-                                    var affiliation = (author.affiliation2.split('. Electronic address: '))
-                                    author.affiliation2 = affiliation[0]
-                                    if (affiliation[1].slice(-1) === '.') {
-                                        author.email = affiliation[1].slice(0, affiliation[1].length - 1)
-                                    } else author.email = affiliation[1]
-                                }
-                            } else author.affiliation2 = affiliationAdress[2]
-                            //console.log("1: " + author.affiliation1 + " 2: " + author.affiliation2)
-                        }
-                        article.authorsList.push(author)
+                        author.affiliation2 = affiliationAdress[2]
+                        if (author.affiliation2 != undefined) {
+                            if (author.affiliation2.includes("Electronic address:")) {
+                                var affiliation = (author.affiliation2.split('. Electronic address: '))
+                                author.affiliation2 = affiliation[0]
+                                if (affiliation[1].slice(-1) === '.') {
+                                    author.email = affiliation[1].slice(0, affiliation[1].length - 1)
+                                } else author.email = affiliation[1]
+                            }
+                        } else author.affiliation2 = affiliationAdress[2]
+                        //console.log("1: " + author.affiliation1 + " 2: " + author.affiliation2)
                     }
-                } else {
-                    author.lastName = authorsListInput.LastName
-                    author.foreName = authorsListInput.ForeName
                     article.authorsList.push(author)
                 }
             } else {
-                article.authorsList = "No author"
-                console.log("No author for " + article.pmid)
+                author.lastName = authorsListInput.LastName
+                author.foreName = authorsListInput.ForeName
+                article.authorsList.push(author)
             }
-
-            console.log()
-            console.log("------------------------- ARTICLE " + i + " / " + publiListInput.length + " -------------------------")
-            console.log(JSON.stringify(article, null, " "))
-            console.log()
-            // console.log("***** Find " + article.authorsList.length + " author(s) for this article *****")
-            // console.log("author(s): " + JSON.stringify(article.authorsList, null, " "))
-
-            //replace_mongoId_byPmid(article)
-            //var publicationsList = [article]
-            //replace_mongoId_byPmid_inArray(publicationsList)
-            // mongoDbInsert(null, article)
-            myGenericMongoClient.genericInsertOne('articles',
-                article,
-                function (err, res) {
-                    res.send(article);
-                });
-            console.log("Article with PMID " + article.pmid + " is successfully saved")
-
-        }
-    }
-
-    var geocoding = function geocodingByGoogle(address) {
-        // mapsApiKey = 'AIzaSyAWttTD7pDklvM1Jha4xbVqe82JcUzRx7k'
-        mapsApiKey = 'AIzaSyCmLt2lwBI0uLNbd8V7boG56frwEfS-QuU'
-        var urlGeoCodingAPI = `https://maps.googleapis.com/maps/api/geocode/json?address= ${address} &key= ${mapsApiKey}`
-        let geocodeRequest = new XMLHttpRequest()
-        geocodeRequest.open("GET", urlGeoCodingAPI)
-        geocodeRequest.send()
-        geocodeRequest.onload = function () {
-            //  if (geocodeRequest.status === 200) {
-            //var geocodeResponse = JSON.parse(geocodeRequest.responseText)
-            //var formatedAddress = geocodeRequest.results[0].formatted_address
-            var latitute = geocodeRequest.results[0].geometry.location.lat
-            var longitude = geocodeRequest.results[0].geometry.location.lng
-
-            console.log("latitude: " + latitute)
-            return { latitute, longitude }
-            //  }
-            // console.log("affiliationGoogle: " + JSON.stringify(affiliationGoogle))
-        }
-    }
-
-    // var geoJson = geocodeResponse.results.
-
-    // console.log("adressGoogle: " + geoJson[0].formatted_address)
-    // console.log("latitude: " + geoJson[0].geometry.location.lat)
-    // console.log("longitude: " + geoJson[0].geometry.location.lng)
-
-
-    // } else {
-    //     console.log(geocodeResponse.results.formatted_address)
-    //     console.log(geocodeResponse.results.geometry.location.lat)
-    //     console.log(geocodeResponse.results.geometry.location.lng)
-    // author.lastName = authorsListInput.LastName
-    // author.foreName = authorsListInput.ForeName
-    // article.authorsList.push(author)
-    //     }
-    // } else {
-    //     // article.authorsList = "No author"
-    //     console.log("No availbale geocode " + article.pmid)
-
-    // if (count != 0) {
-    //     var querykey = responseJs.esearchresult.querykey
-    //     var webenv = responseJs.esearchresult.webenv
-    //     console.log("status: " + geocodeResponse.status)
-    //     find_Article_Data_byFtech_with_PMID(querykey, webenv)
-    // } else {
-    //     console.log(geocodeResponse.status)
-    // }
-
-
-
-
-    // function mongoDbInsert (req, res, next) {
-    //     var newArticle = res;
-    //     myGenericMongoClient.genericInsertOne('articles',
-    //         newArticle,
-    //         function (err, res) {
-    //             res.send(newArticle);
-    //             console.log("Article is successfully saved")
-    //         });
-    //     }
-
-    // AuthorsData when request return a list of articles
-    function authorsList_data_for_list_of_articles(publiListInput) {
-        var authorsListInput = publiListInput[i].MedlineCitation.Article.AuthorList.Author
-        for (index in authorsListInput) {
-            var author = new Object()
-            author.lastName = authorsListInput[index].LastName
-            author.foreName = authorsListInput[index].ForeName
-
-            // article.authorsList = []
-            authorsList.push(author)
+        } else {
+            article.authorsList = "No author"
+            console.log("No author for " + article.pmid)
         }
 
-        // console.log("***** Find " + authorsList.length + " authors for this article *****")
-        // console.log("authors: " + JSON.stringify(authorsList, null, " "))
+        console.log()
+        console.log("------------------------- ARTICLE " + i + " / " + publiListInput.length + " -------------------------")
+        console.log(JSON.stringify(article, null, " "))
+        console.log()
+        // console.log("***** Find " + article.authorsList.length + " author(s) for this article *****")
+        // console.log("author(s): " + JSON.stringify(article.authorsList, null, " "))
+
+        //replace_mongoId_byPmid(article)
+        //var publicationsList = [article]
+        //replace_mongoId_byPmid_inArray(publicationsList)
+        // mongoDbInsert(null, article)
+        myGenericMongoClient.genericInsertOne('articles',
+            article,
+            function (err, res) {
+                res.send(article);
+            });
+        console.log("Article with PMID " + article.pmid + " is successfully saved")
+
+    }
+}
+
+   /* var geocoding = */function geocodingByGoogle(address) {
+    // mapsApiKey = 'AIzaSyAWttTD7pDklvM1Jha4xbVqe82JcUzRx7k'
+    mapsApiKey = 'AIzaSyCmLt2lwBI0uLNbd8V7boG56frwEfS-QuU'
+    var urlGeoCodingAPI = `https://maps.googleapis.com/maps/api/geocode/json?address= ${address} &key= ${mapsApiKey}`
+    let geocodeRequest = new XMLHttpRequest()
+    geocodeRequest.open("GET", urlGeoCodingAPI)
+    geocodeRequest.send()
+    geocodeRequest.onload = function () {
+        //  if (geocodeRequest.status === 200) {
+        var geocodeResponse = JSON.parse(geocodeRequest.responseText)
+        // formatedAddress = geocodeRequest.results[0].formatted_address
+        // latitude = geocodeResponse.results[0].geometry.location.lat
+        // longitude = geocodeResponse.results[0].geometry.location.lng
+        // console.log("latitude: " + latitude)
+        // }
+        return geocodeResponse
+    }
+}
+
+// var geoJson = geocodeResponse.results.
+
+// console.log("adressGoogle: " + geoJson[0].formatted_address)
+// console.log("latitude: " + geoJson[0].geometry.location.lat)
+// console.log("longitude: " + geoJson[0].geometry.location.lng)
+
+
+// } else {
+//     console.log(geocodeResponse.results.formatted_address)
+//     console.log(geocodeResponse.results.geometry.location.lat)
+//     console.log(geocodeResponse.results.geometry.location.lng)
+// author.lastName = authorsListInput.LastName
+// author.foreName = authorsListInput.ForeName
+// article.authorsList.push(author)
+//     }
+// } else {
+//     // article.authorsList = "No author"
+//     console.log("No availbale geocode " + article.pmid)
+
+// if (count != 0) {
+//     var querykey = responseJs.esearchresult.querykey
+//     var webenv = responseJs.esearchresult.webenv
+//     console.log("status: " + geocodeResponse.status)
+//     find_Article_Data_byFtech_with_PMID(querykey, webenv)
+// } else {
+//     console.log(geocodeResponse.status)
+// }
+
+
+
+
+// function mongoDbInsert (req, res, next) {
+//     var newArticle = res;
+//     myGenericMongoClient.genericInsertOne('articles',
+//         newArticle,
+//         function (err, res) {
+//             res.send(newArticle);
+//             console.log("Article is successfully saved")
+//         });
+//     }
+
+// AuthorsData when request return a list of articles
+function authorsList_data_for_list_of_articles(publiListInput) {
+    var authorsListInput = publiListInput[i].MedlineCitation.Article.AuthorList.Author
+    for (index in authorsListInput) {
+        var author = new Object()
+        author.lastName = authorsListInput[index].LastName
+        author.foreName = authorsListInput[index].ForeName
+
+        // article.authorsList = []
+        authorsList.push(author)
     }
 
+    // console.log("***** Find " + authorsList.length + " authors for this article *****")
+    // console.log("authors: " + JSON.stringify(authorsList, null, " "))
+}
 
-    // AuthorsData when request return only one article
-    function AuthorsList_data_for_one_article(responseJs) {
-        var authorsListInput = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.Article.AuthorList
-        for (i in authorsListInput) {
-            var author = new Object()
-            author.lastName = authorsListInput[i].LastName
-            author.foreName = authorsListInput[i].ForeName
-            console.log(author)
-            // authorsList.push(author)
+
+// AuthorsData when request return only one article
+function AuthorsList_data_for_one_article(responseJs) {
+    var authorsListInput = responseJs.PubmedArticleSet.PubmedArticle.MedlineCitation.Article.AuthorList
+    for (i in authorsListInput) {
+        var author = new Object()
+        author.lastName = authorsListInput[i].LastName
+        author.foreName = authorsListInput[i].ForeName
+        console.log(author)
+        // authorsList.push(author)
+    }
+    // return authorsList
+}
+
+
+// Conversion of xml results to Js object
+const removeJsonTextAttribute = function (value, parentElement) {
+    try {
+        const parentOfParent = parentElement._parent;
+        const pOpKeys = Object.keys(parentElement._parent);
+        const keyNo = pOpKeys.length;
+        const keyName = pOpKeys[keyNo - 1];
+        const arrOfKey = parentElement._parent[keyName];
+        const arrOfKeyLen = arrOfKey.length;
+        if (arrOfKeyLen > 0) {
+            const arr = arrOfKey;
+            const arrIndex = arrOfKey.length - 1;
+            arr[arrIndex] = value;
+        } else {
+            parentElement._parent[keyName] = value;
         }
-        // return authorsList
-    }
+    } catch (e) { }
+};
+
+var options = {
+    compact: true,
+    spaces: 2,
+    trim: true,
+    nativeType: false,
+    ignoreDeclaration: true,
+    ignoreInstruction: true,
+    ignoreAttributes: true,
+    ignoreComment: true,
+    ignoreCdata: true,
+    ignoreDoctype: true,
+    textFn: removeJsonTextAttribute
+};
+
+// function xml_to_Js (responseText, options) {
+//     convert.xml2js(responseText, options);
+// }
 
 
-    // Conversion of xml results to Js object
-    const removeJsonTextAttribute = function (value, parentElement) {
-        try {
-            const parentOfParent = parentElement._parent;
-            const pOpKeys = Object.keys(parentElement._parent);
-            const keyNo = pOpKeys.length;
-            const keyName = pOpKeys[keyNo - 1];
-            const arrOfKey = parentElement._parent[keyName];
-            const arrOfKeyLen = arrOfKey.length;
-            if (arrOfKeyLen > 0) {
-                const arr = arrOfKey;
-                const arrIndex = arrOfKey.length - 1;
-                arr[arrIndex] = value;
-            } else {
-                parentElement._parent[keyName] = value;
-            }
-        } catch (e) { }
-    };
-
-    var options = {
-        compact: true,
-        spaces: 2,
-        trim: true,
-        nativeType: false,
-        ignoreDeclaration: true,
-        ignoreInstruction: true,
-        ignoreAttributes: true,
-        ignoreComment: true,
-        ignoreCdata: true,
-        ignoreDoctype: true,
-        textFn: removeJsonTextAttribute
-    };
-
-    // function xml_to_Js (responseText, options) {
-    //     convert.xml2js(responseText, options);
-    // }
-
-
-    exports.apiRouter = apiRouter;
+exports.apiRouter = apiRouter;
 
 
 ///////////////////////////////////////////////////////////////////////////////////
