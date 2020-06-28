@@ -12,8 +12,10 @@ const optionDate = { year: "numeric", month: "2-digit", day: "2-digit" }
 
 // Replace mongoId by PMID
 function replace_mongoId_byPmid(article) {
-    article._id = article.pmid;
-    delete article._id;
+    if (article != null) {
+        article._id = article.pmid;
+        delete article._id;
+    }
     return article;
 }
 
@@ -38,14 +40,28 @@ function findArticlesWithDateMini(articles, dateMini) {
 }
 
 // Get article by pmid
-//exemple URL: http://localhost:9999/article-api/public/article/30926242
-apiRouter.route('/article-api/public/article/:pmid')
+//exemple URL: http://localhost:9999/article-api/public/article/pmid/19909739
+apiRouter.route('/article-api/public/article/pmid/:pmid')
     .get(function (req, res, next) {
         var articlePmid = req.params.pmid;
+        console.log("articlePmid: " + articlePmid)
         myGenericMongoClient.genericFindOne('articles',
             { 'pmid': articlePmid },
             function (err, article) {
                 res.send(replace_mongoId_byPmid(article));
+            });
+    });
+
+// Get article by a word in title
+//exemple URL: http://localhost:9999/article-api/public/article/title/USP25
+apiRouter.route('/article-api/public/article/title/:articleTitle')
+    .get(function (req, res, next) {
+        var titleSearch = req.params.articleTitle;
+        myGenericMongoClient.genericFindList('articles',
+            { 'articleTitle': { $regex: titleSearch} },
+            function (err, articlesListTitle) {
+                res.send(replace_mongoId_byPmid(articlesListTitle));
+                console.log("number of articles with this search: " + articlesListTitle.length)
             });
     });
 
@@ -304,10 +320,10 @@ function attributes_for_list_of_articles(publiListInput) {
                             //         // console.log(res.upsertedCount)                                });
                             //     })
                             //    }
-                            myGenericMongoClient.genericInsertOne('geoloc', geolocList,  function (err, res) {
+                            myGenericMongoClient.genericInsertOne('geoloc', geolocList, function (err, res) {
                                 res.send(geoloc);
                             });
-                        //console.log(`geoloc: ${geoloc.pmid} - ${geoloc.latitude} - ${geoloc.longitude}`)
+                            //console.log(`geoloc: ${geoloc.pmid} - ${geoloc.latitude} - ${geoloc.longitude}`)
                         }
                         // console.log("test: " + geocodeResponse.results[0].geometry.location.lat)
                         // affiliation1.latitude = 
