@@ -113,20 +113,21 @@ apiRouter.route('/article-api/public/article/pmid/:pmid')
 apiRouter.route('/article-api/public/articles/title/:articleTitle')
     .get(function (req, res, next) {
         var titleSearch = req.params.articleTitle;
+        var titleSearchFormatted = titleSearch.replace(/[+]/g, "|")
         myGenericMongoClient.genericFindList('articles',
-            { 'articleTitle': { $regex: titleSearch } },
+            { 'articleTitle': { $regex: titleSearchFormatted, $options: 'i' } },
             function (err, articlesListTitle) {
                 res.send(replace_mongoId_byPmid(articlesListTitle));
-                console.log("number of articles with this search in title: " + articlesListTitle.length)
+                console.log("number of articles with this search \"" + titleSearchFormatted + "\" in title: " + articlesListTitle.length)
             });
     });
 
 // Get article by journal
-//exemple URL: http://localhost:9999/article-api/public/articles/journal/Molecular-cell
+//exemple URL: http://localhost:9999/article-api/public/articles/journal/Molecular+cell
 apiRouter.route('/article-api/public/articles/journal/:journal')
     .get(function (req, res, next) {
         var journalSearch = req.params.journal;
-        var journalSearchFormatted = journalSearch.replace(/[-]/, " ")
+        var journalSearchFormatted = journalSearch.replace(/[+]/g, " ")
         console.log("journal: " + journalSearchFormatted)
         myGenericMongoClient.genericFindList('articles',
             { 'journal': journalSearchFormatted },
@@ -138,17 +139,32 @@ apiRouter.route('/article-api/public/articles/journal/:journal')
 
 
 // Get article with required words in abstract
-//exemple URL: http://localhost:9999/article-api/public/articles/abstract/USP25
+//exemple URL: http://localhost:9999/article-api/public/articles/abstract/usp28+USP25
 apiRouter.route('/article-api/public/articles/abstract/:articleAbstract')
     .get(function (req, res, next) {
         var wordsSearch = req.params.articleAbstract;
-        var abstractSearchFormatted = wordsSearch.replace(/[-]/, "|")
+        var abstractSearchFormatted = wordsSearch.replace(/[+]/g, "|")
         console.log(abstractSearchFormatted)
         myGenericMongoClient.genericFindList('articles',
             { 'articleAbstract': { $regex: abstractSearchFormatted, $options: 'i' } },
             function (err, articlesListAbstract) {
                 res.send(replace_mongoId_byPmid(articlesListAbstract));
-                console.log("number of articles with this search in abstract: " + articlesListAbstract.length)
+                console.log("number of articles with this search \"" + abstractSearchFormatted + "\" in abstract: " + articlesListAbstract.length)
+            });
+    });
+
+// Get article with required words in keywords
+//exemple URL: http://localhost:9999/article-api/public/articles/keywords/ubiquitin-specific-protease
+apiRouter.route('/article-api/public/articles/keywords/:keywordsList')
+    .get(function (req, res, next) {
+        var keywordsSearch = req.params.keywordsList;
+        var keywordsSearchFormatted = keywordsSearch.replace(/[+]/g, " ")
+        console.log(keywordsSearchFormatted)
+        myGenericMongoClient.genericFindList('articles',
+            { 'keywordsList': { $regex: keywordsSearchFormatted } } ,
+            function (err, articlesListKeywords) {
+                res.send(replace_mongoId_byPmid(articlesListKeywords));
+                console.log("number of articles with this search \"" + keywordsSearchFormatted + "\" in keywords: " + articlesListKeywords.length)
             });
     });
 
