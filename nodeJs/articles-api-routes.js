@@ -36,8 +36,64 @@ function findArticlesWithDateMini(articles, dateMini) {
             selArticles.push(articles[i]);
         }
     }
+    console.log("number of articles: " + selArticles.length + " published /revised after " + dateMini)
     return selArticles;
 }
+
+// Find article with pmid
+// function findArticlesWithPmid(articles, pmidSearch) {
+//     var selArticles = [];
+//     for (i in articles) {
+//         if (articles[i].pmid = pmidSearch) {
+//             selArticles.push(articles[i]);
+//         }
+//     }
+//     console.log("number of articles: " + selArticles.length + " with pmid " + pmidSearch)
+//     return selArticles;
+// }
+
+//Get all articles / Get all articles published / revised after a date
+//exemple URL: http://localhost:9999/article-api/public/articles (returning all articles)
+//             http://localhost:9999/article-api/public/articles?dateMini=2020-06-19
+apiRouter.route('/article-api/public/articles')
+    .get(function (req, res, next) {
+        var dateMini = req.query.dateMini;
+        myGenericMongoClient.genericFindList('articles', {}, function (err, allArticle) {
+            if (dateMini) {
+                res.send(replace_mongoId_byPmid_inArray(findArticlesWithDateMini(allArticle, dateMini)));
+            } else {
+                res.send(replace_mongoId_byPmid_inArray(allArticle));
+                console.log("number of articles: " + allArticle.length)
+
+            }
+        });
+    });
+
+// switch dateMini or Pmid NE FONCTIONNE PAS
+// apiRouter.route('/article-api/public/articles')
+//     .get(function (req, res, next) {
+//         var filter = req.query.filter
+//         // var dateMini
+//         // var pmidSearch
+//         myGenericMongoClient.genericFindList('articles', {}, function (err, allArticle) {
+//             switch (filter) {
+//                 case 'dateMini':
+//                     res.send(replace_mongoId_byPmid_inArray(findArticlesWithDateMini(allArticle, dateMini)));
+//                     break
+//                 case 'pmidSearch':
+//                     res.send(replace_mongoId_byPmid_inArray(findArticlesWithPmid(allArticle, pmidSearch)));
+//                     console.log(filter)
+//                     break
+//                 default:
+//                     res.send(replace_mongoId_byPmid_inArray(allArticle));
+//                     console.log("number of articles: " + allArticle.length)
+//                     break
+
+//             }
+
+//         }
+//         );
+//     });
 
 // Get article by pmid
 //exemple URL: http://localhost:9999/article-api/public/article/pmid/19909739
@@ -52,31 +108,32 @@ apiRouter.route('/article-api/public/article/pmid/:pmid')
             });
     });
 
-// Get article by a word in title
-//exemple URL: http://localhost:9999/article-api/public/article/title/USP25
-apiRouter.route('/article-api/public/article/title/:articleTitle')
+// Get article with a required word in title
+//exemple URL: http://localhost:9999/article-api/public/articles/title/USP25
+apiRouter.route('/article-api/public/articles/title/:articleTitle')
     .get(function (req, res, next) {
         var titleSearch = req.params.articleTitle;
         myGenericMongoClient.genericFindList('articles',
-            { 'articleTitle': { $regex: titleSearch} },
+            { 'articleTitle': { $regex: titleSearch } },
             function (err, articlesListTitle) {
                 res.send(replace_mongoId_byPmid(articlesListTitle));
                 console.log("number of articles with this search: " + articlesListTitle.length)
             });
     });
 
-//exemple URL: http://localhost:9999/article-api/public/articles (returning all articles)
-//             http://localhost:9999/article-api/public/articles?dateMini=2010-01-01
-apiRouter.route('/article-api/public/articles')
+// Get article by journal
+//exemple URL: http://localhost:9999/article-api/public/articles/journal/Molecular-cell
+apiRouter.route('/article-api/public/articles/journal/:journal')
     .get(function (req, res, next) {
-        var dateMini = req.query.dateMini;
-        myGenericMongoClient.genericFindList('articles', {}, function (err, allArticle) {
-            if (dateMini) {
-                res.send(replace_mongoId_byPmid_inArray(findArticlesWithDateMini(allArticle, dateMini)));
-            } else {
-                res.send(replace_mongoId_byPmid_inArray(allArticle));
-            }
-        });
+        var journalSearch = req.params.journal;
+        var journalSearchFormatted = journalSearch.replace(/[-]/," ")
+        console.log("journal: "+ journalSearchFormatted)
+        myGenericMongoClient.genericFindList('articles',
+            { 'journal': journalSearchFormatted },
+            function (err, articlesListJournal) {
+                res.send(replace_mongoId_byPmid(articlesListJournal));
+                console.log("number of articles with this search: " + articlesListJournal.length)
+            });
     });
 
 // exemple URL: http://localhost:9999/article-api/public/geoloc (returning all geoloc)
