@@ -63,7 +63,7 @@ apiRouter.route('/article-api/public/articles')
                 res.send(replace_mongoId_byPmid_inArray(findArticlesWithDateMini(allArticle, dateMini)));
             } else {
                 res.send(replace_mongoId_byPmid_inArray(allArticle));
-                console.log("number of articles: " + allArticle.length)
+                console.log("number of articles in database: " + allArticle.length)
 
             }
         });
@@ -117,7 +117,7 @@ apiRouter.route('/article-api/public/articles/title/:articleTitle')
             { 'articleTitle': { $regex: titleSearch } },
             function (err, articlesListTitle) {
                 res.send(replace_mongoId_byPmid(articlesListTitle));
-                console.log("number of articles with this search: " + articlesListTitle.length)
+                console.log("number of articles with this search in title: " + articlesListTitle.length)
             });
     });
 
@@ -126,13 +126,29 @@ apiRouter.route('/article-api/public/articles/title/:articleTitle')
 apiRouter.route('/article-api/public/articles/journal/:journal')
     .get(function (req, res, next) {
         var journalSearch = req.params.journal;
-        var journalSearchFormatted = journalSearch.replace(/[-]/," ")
-        console.log("journal: "+ journalSearchFormatted)
+        var journalSearchFormatted = journalSearch.replace(/[-]/, " ")
+        console.log("journal: " + journalSearchFormatted)
         myGenericMongoClient.genericFindList('articles',
             { 'journal': journalSearchFormatted },
             function (err, articlesListJournal) {
                 res.send(replace_mongoId_byPmid(articlesListJournal));
-                console.log("number of articles with this search: " + articlesListJournal.length)
+                console.log("number of articles in " + journalSearchFormatted + " journal: " + articlesListJournal.length)
+            });
+    });
+
+
+// Get article with required words in abstract
+//exemple URL: http://localhost:9999/article-api/public/articles/abstract/USP25
+apiRouter.route('/article-api/public/articles/abstract/:articleAbstract')
+    .get(function (req, res, next) {
+        var wordsSearch = req.params.articleAbstract;
+        var abstractSearchFormatted = wordsSearch.replace(/[-]/, "|")
+        console.log(abstractSearchFormatted)
+        myGenericMongoClient.genericFindList('articles',
+            { 'articleAbstract': { $regex: abstractSearchFormatted, $options: 'i' } },
+            function (err, articlesListAbstract) {
+                res.send(replace_mongoId_byPmid(articlesListAbstract));
+                console.log("number of articles with this search in abstract: " + articlesListAbstract.length)
             });
     });
 
