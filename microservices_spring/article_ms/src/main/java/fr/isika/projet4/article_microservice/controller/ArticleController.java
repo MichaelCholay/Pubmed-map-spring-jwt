@@ -75,6 +75,17 @@ public class ArticleController {
 					.log();
 			}
 	
+		// WebCLient get Articles by journal
+				@ApiOperation(value = "Find a list of articles published in a specific journal")
+				@GetMapping(path = "/articles/journal/{journal}")
+				private Flux<Article> getArticleByJournal(@PathVariable String journal) {
+					 return client.get()
+							.uri("/article-api/public/articles/journal/" + journal)
+							.accept(MediaType.APPLICATION_JSON)
+							.retrieve()
+							.bodyToFlux(Article.class)
+							.log();
+					}
 
 //	@ApiOperation(value = "Find aticles by title")
 //	public @ResponseBody List<Article> findArticleTitleLike(@PathVariable String articleTitle) {
