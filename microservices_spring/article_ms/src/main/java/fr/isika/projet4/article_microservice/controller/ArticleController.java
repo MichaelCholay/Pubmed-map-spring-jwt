@@ -98,6 +98,18 @@ public class ArticleController {
 							.bodyToFlux(Article.class)
 							.log();
 					}
+				
+				// WebCLient get Articles by keywords search
+				@ApiOperation(value = "Find a list of articles with specific keywords")
+				@GetMapping(path = "/articles/keywords/{keyword}")
+				private Flux<Article> getArticleByKeyword(@PathVariable String keyword) {
+					 return client.get()
+							.uri("/article-api/public/articles/keywords/" + keyword)
+							.accept(MediaType.APPLICATION_JSON)
+							.retrieve()
+							.bodyToFlux(Article.class)
+							.log();
+					}
 
 //	@ApiOperation(value = "Find aticles by title")
 //	public @ResponseBody List<Article> findArticleTitleLike(@PathVariable String articleTitle) {
