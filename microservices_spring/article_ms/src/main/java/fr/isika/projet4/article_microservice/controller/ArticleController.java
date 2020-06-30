@@ -36,7 +36,6 @@ public class ArticleController {
 	// WebCLient getAllArticles with optional dateMini
 	@ApiOperation(value = "Get all articles with a revision date optional filter")
 	@GetMapping(path = "/articles")
-//	@ResponseBody
 	private Flux<Article> getAllArticlesWithDateMini(@RequestParam(required = false) String dateMini) {
 		if (dateMini != null) {
 			uriGetArticles = "/article-api/public/articles?dateMini=" + dateMini;
@@ -110,6 +109,23 @@ public class ArticleController {
 							.bodyToFlux(Article.class)
 							.log();
 					}
+				
+				// WebCLient get Articles by author
+				@ApiOperation(value = "Find a list of articles of a specific author")
+				@GetMapping(path = "/articles/author/{lastName}")				
+				private Flux<Article> getAllArticlesByAuthor(@PathVariable String lastName, @RequestParam(required = false) String foreName) {
+					if (foreName != null) {
+						uriGetArticles = "/article-api/public/articles/author/" + lastName + "?foreName=" + foreName;
+					} else {
+						uriGetArticles = "/article-api/public/articles/author/" + lastName;
+					}
+				 	return client.get()
+							.uri(uriGetArticles)
+							.accept(MediaType.APPLICATION_JSON)
+							.retrieve()
+							.bodyToFlux(Article.class)
+							.log();
+				}
 
 //	@ApiOperation(value = "Find aticles by title")
 //	public @ResponseBody List<Article> findArticleTitleLike(@PathVariable String articleTitle) {
