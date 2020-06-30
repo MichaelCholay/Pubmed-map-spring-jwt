@@ -86,6 +86,18 @@ public class ArticleController {
 							.bodyToFlux(Article.class)
 							.log();
 					}
+				
+				// WebCLient get Articles by abstract search
+				@ApiOperation(value = "Find a list of articles with specific words in its abstract")
+				@GetMapping(path = "/articles/abstract/{wordAbstract}")
+				private Flux<Article> getArticleByAbstract(@PathVariable String wordAbstract) {
+					 return client.get()
+							.uri("/article-api/public/articles/abstract/" + wordAbstract)
+							.accept(MediaType.APPLICATION_JSON)
+							.retrieve()
+							.bodyToFlux(Article.class)
+							.log();
+					}
 
 //	@ApiOperation(value = "Find aticles by title")
 //	public @ResponseBody List<Article> findArticleTitleLike(@PathVariable String articleTitle) {
