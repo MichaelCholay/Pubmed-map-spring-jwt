@@ -51,8 +51,8 @@ public class ArticleController {
 				.log();
 	}
 	
-	// WebCLient getAllArticles with optional dateMini
-	@ApiOperation(value = "Find a specific article with PMID")
+	// WebCLient get Article by PMID
+	@ApiOperation(value = "Find one specific article with its PMID")
 	@GetMapping(path = "/article/pmid/{pmid}")
 	private Mono<Article> getArticleByPmid(@PathVariable String pmid) {
 		 return client.get()
@@ -62,6 +62,18 @@ public class ArticleController {
 				.bodyToMono(Article.class)
 				.log();
 		}
+	
+	// WebCLient get Articles by title
+		@ApiOperation(value = "Find a list of articles with specific words in its title")
+		@GetMapping(path = "/articles/title/{wordTitle}")
+		private Flux<Article> getArticleByTitle(@PathVariable String wordTitle) {
+			 return client.get()
+					.uri("/article-api/public/articles/title/" + wordTitle)
+					.accept(MediaType.APPLICATION_JSON)
+					.retrieve()
+					.bodyToFlux(Article.class)
+					.log();
+			}
 	
 
 //	@ApiOperation(value = "Find aticles by title")
