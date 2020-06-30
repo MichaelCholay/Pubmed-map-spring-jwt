@@ -7,21 +7,18 @@ public class Affiliation {
 	
 	String affiliationPubmed;
 	
-	// data after geocoding by Google Maps API
-	String formattedAddress;
-	
-	String latitute;
-	
-	String longitude;
+//	// data after geocoding by Google Maps API
+//	String formattedAddress;
+//	
+//	String latitute;
+//	
+//	String longitude;
 
 	////////// Constructors \\\\\\\\\\
 	
-	public Affiliation(String affiliationPubmed, String formatted_address, String latitute, String longitude) {
+	public Affiliation(String affiliationPubmed) {
 		super();
 		this.affiliationPubmed = affiliationPubmed;
-		this.formattedAddress = formatted_address;
-		this.latitute = latitute;
-		this.longitude = longitude;
 	}
 
 	public Affiliation() {
@@ -33,8 +30,7 @@ public class Affiliation {
 	
 	@Override
 	public String toString() {
-		return "Affiliation [affiliationPubmed=" + affiliationPubmed + ", formattedAddress=" + formattedAddress
-				+ ", latitute=" + latitute + ", longitude=" + longitude + "]";
+		return "Affiliation [affiliationPubmed=" + affiliationPubmed + "]";
 	}
 
 	////////// Getters - Setters \\\\\\\\\\
@@ -47,27 +43,4 @@ public class Affiliation {
 		this.affiliationPubmed = affiliationPubmed;
 	}
 
-	public String getFormatted_address() {
-		return formattedAddress;
-	}
-
-	public void setFormatted_address(String formatted_address) {
-		this.formattedAddress = formatted_address;
-	}
-
-	public String getLatitute() {
-		return latitute;
-	}
-
-	public void setLatitute(String latitute) {
-		this.latitute = latitute;
-	}
-
-	public String getLongitude() {
-		return longitude;
-	}
-
-	public void setLongitude(String longitude) {
-		this.longitude = longitude;
-	}	
 }
