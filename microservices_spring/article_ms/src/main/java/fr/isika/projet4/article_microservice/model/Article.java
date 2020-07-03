@@ -15,7 +15,7 @@ public class Article {
 //	@Id
 //	private ObjectId _id;
 	
-	private Long pmid;
+	private Long _id;
 
 	private String articleTitle;
 
@@ -57,7 +57,7 @@ public class Article {
 
 	@Override
 	public String toString() {
-		return "Article [pmid=" + pmid + ", articleTitle=" + articleTitle + ", journal=" + journal
+		return "Article [pmid=" + _id + ", articleTitle=" + articleTitle + ", journal=" + journal
 				+ ", publicationDate=" + publicationDate + ", revisionDate=" + revisionDate + ", articleAbstract="
 				+ articleAbstract + ", pubmedUrl=" + pubmedUrl + ", keywordsList=" + keywordsList + ", authorsList="
 				+ authorsList + "]";
@@ -69,12 +69,12 @@ public class Article {
 	////////// Getters-setters \\\\\\\\\\
 
 	public Long getPmid() {
-		return pmid;
+		return _id;
 	}
 
 
 	public void setPmid(Long pmid) {
-		this.pmid = pmid;
+		this._id = pmid;
 	}
 
 	public String getArticleTitle() {
