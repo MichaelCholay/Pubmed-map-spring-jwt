@@ -11,11 +11,15 @@ public class Author {
 	
 	private String foreName;
 	
-	private Affiliation affiliation1;
+	private String affiliationPubmed;
 	
-	private Affiliation affiliation2;
+	private String googleFormatedAdress;
 	
 	private String email;
+	
+	private double latitude;
+	
+	private double longitude;
 	
 	
 	////////// Constructors \\\\\\\\\\
@@ -24,67 +28,118 @@ public class Author {
 		super();
 	}
 	
-	public Author(String lastName, String foreName, Affiliation affiliation1, Affiliation affiliation2, String email) {
+	
+
+	public Author(String lastName, String foreName, String affiliationPubmed, String googleFormatedAdress, String email,
+			double latitude, double longitude) {
 		super();
 		this.lastName = lastName;
 		this.foreName = foreName;
-		this.affiliation1 = affiliation1;
-		this.affiliation2 = affiliation2;
+		this.affiliationPubmed = affiliationPubmed;
+		this.googleFormatedAdress = googleFormatedAdress;
 		this.email = email;
+		this.latitude = latitude;
+		this.longitude = longitude;
 	}
+
+
 
 	////////// toString \\\\\\\\\\
 
 	@Override
 	public String toString() {
-		return "Author [lastName=" + lastName + ", foreName=" + foreName + ", affiliation1=" + affiliation1
-				+ ", affiliation2=" + affiliation2 + ", email=" + email + "]";
+		return "Author [lastName=" + lastName + ", foreName=" + foreName + ", affiliationPubmed=" + affiliationPubmed
+				+ ", googleFormatedAdress=" + googleFormatedAdress + ", email=" + email + ", latitude=" + latitude
+				+ ", longitude=" + longitude + "]";
 	}
 
-	////////// Getters - Setters \\\\\\\\\\
 
+	////////// Getters - Setters \\\\\\\\\\
 
 	public String getLastName() {
 		return lastName;
 	}
 
+
+
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
+
+
 
 	public String getForeName() {
 		return foreName;
 	}
 
+
+
 	public void setForeName(String foreName) {
 		this.foreName = foreName;
 	}
 
-	public Affiliation getAffiliation1() {
-		return affiliation1;
+
+
+	public String getAffiliationPubmed() {
+		return affiliationPubmed;
 	}
 
-	public void setAffiliation1(Affiliation affiliation1) {
-		this.affiliation1 = affiliation1;
+
+
+	public void setAffiliationPubmed(String affiliationPubmed) {
+		this.affiliationPubmed = affiliationPubmed;
 	}
 
-	public Affiliation getAffiliation2() {
-		return affiliation2;
+
+
+	public String getGoogleFormatedAdress() {
+		return googleFormatedAdress;
 	}
 
-	public void setAffiliation2(Affiliation affiliation2) {
-		this.affiliation2 = affiliation2;
+
+
+	public void setGoogleFormatedAdress(String googleFormatedAdress) {
+		this.googleFormatedAdress = googleFormatedAdress;
 	}
+
+
 
 	public String getEmail() {
 		return email;
 	}
 
+
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
-	
+
+
+
+	public double getLatitude() {
+		return latitude;
+	}
+
+
+
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
+
+
+
+	public double getLongitude() {
+		return longitude;
+	}
+
+
+
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
+	}
+
+
+
 	
 	
 }
