@@ -1,12 +1,9 @@
 package fr.isika.projet4.article_microservice.model;
 
-import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 //@Document(collection = "articles")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -57,7 +54,7 @@ public class Article {
 
 	@Override
 	public String toString() {
-		return "Article [pmid=" + _id + ", articleTitle=" + articleTitle + ", journal=" + journal
+		return "Article [_id=" + _id + ", articleTitle=" + articleTitle + ", journal=" + journal
 				+ ", publicationDate=" + publicationDate + ", revisionDate=" + revisionDate + ", articleAbstract="
 				+ articleAbstract + ", pubmedUrl=" + pubmedUrl + ", keywordsList=" + keywordsList + ", authorsList="
 				+ authorsList + "]";
@@ -68,19 +65,19 @@ public class Article {
 
 	////////// Getters-setters \\\\\\\\\\
 
-	public Long getPmid() {
+	
+	public Long get_id() {
 		return _id;
 	}
 
-
-	public void setPmid(Long pmid) {
-		this._id = pmid;
+	public void set_id(Long _id) {
+		this._id = _id;
 	}
 
 	public String getArticleTitle() {
 		return articleTitle;
 	}
-
+	
 	public void setArticleTitle(String articleTitle) {
 		this.articleTitle = articleTitle;
 	}

@@ -40,15 +40,15 @@ public class ArticleController {
 				.accept(MediaType.APPLICATION_JSON)
 				.retrieve()
 				.bodyToFlux(Article.class)
-				.log();
+				.log(); 
 	}
 
 	// WebCLient get Article by PMID
 	@ApiOperation(value = "Find one specific article with its PMID")
-	@GetMapping(path = "/article/pmid/{pmid}")
-	private Mono<Article> getArticleByPmid(@PathVariable String pmid) {
+	@GetMapping(path = "/article/pmid/{_id}")
+	private Mono<Article> getArticleByPmid(@PathVariable String _id) {
 		return client.get()
-				.uri("/article-api/public/article/pmid/" + pmid)
+				.uri("/article-api/public/article/pmid/" + _id)
 				.accept(MediaType.APPLICATION_JSON)
 				.retrieve()
 				.bodyToMono(Article.class)

@@ -9,7 +9,7 @@ import fr.isika.projet4.article_microservice.model.Article;
 
 public interface ArticleRepository extends MongoRepository<Article, String> {
 
-	Article findByPmid(Long pmid);
+	Article findBy_id(Long _id);
 	
 	List<Article> findByArticleTitleLike(String articleTitle);
 	
