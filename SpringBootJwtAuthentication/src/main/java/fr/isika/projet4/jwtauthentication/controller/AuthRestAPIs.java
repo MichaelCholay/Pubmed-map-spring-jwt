@@ -33,7 +33,7 @@ import fr.isika.projet4.jwtauthentication.security.jwt.JwtProvider;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api-auth")
 public class AuthRestAPIs {
 
 	@Autowired
