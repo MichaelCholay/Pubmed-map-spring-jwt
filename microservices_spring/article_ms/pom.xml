@@ -10,9 +10,9 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>fr.isika.projet4</groupId>
-	<artifactId>article_microservice</artifactId>
+	<artifactId>article_microserviceOLD</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>article_microservice</name>
+	<name>article_microserviceOLD</name>
 	<description>Microservice to create articles from MongoDB</description>
 
 	<properties>
