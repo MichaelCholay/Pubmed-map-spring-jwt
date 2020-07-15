@@ -1,8 +1,6 @@
 package fr.isika.projet4.jwtauthentication.model;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -53,7 +51,7 @@ public class User {
 	private Set<Role> roles = new HashSet<>();
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "users")
-	private List<FavoriteArticle> favoriteArticles = new ArrayList<>();
+	private Set<FavoriteArticle> favoriteArticles = new HashSet<>();
 
 	public User() {
 	}

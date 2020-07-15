@@ -1,8 +1,8 @@
 package fr.isika.projet4.jwtauthentication.model;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -46,7 +46,7 @@ public class FavoriteArticle {
 	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	@JoinTable(name = "favoriteArticle_user", joinColumns = {
 			@JoinColumn(name = "favoriteArticle_id") }, inverseJoinColumns = { @JoinColumn(name = "user_id") })
-	private List<User> users = new ArrayList<>();
+	private Set<User> users = new HashSet<>();
 
 	////////// Constructors \\\\\\\\\\
 
