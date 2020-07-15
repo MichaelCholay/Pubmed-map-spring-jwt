@@ -62,6 +62,12 @@ public class User {
 		this.email = email;
 		this.password = password;
 	}
+	
+	
+	// Constructor for Junit
+	public User(String username) {
+		this.username = username;
+	}
 
 	public Long getId() {
 		return id;
@@ -110,4 +116,14 @@ public class User {
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
 	}
+
+	public Set<FavoriteArticle> getFavoriteArticles() {
+		return favoriteArticles;
+	}
+
+	public void setFavoriteArticles(Set<FavoriteArticle> favoriteArticles) {
+		this.favoriteArticles = favoriteArticles;
+	}
+	
+	
 }

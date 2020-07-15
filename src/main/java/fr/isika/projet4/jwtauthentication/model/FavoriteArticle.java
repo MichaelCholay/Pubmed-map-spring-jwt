@@ -45,7 +45,10 @@ public class FavoriteArticle {
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	@JoinTable(name = "favoriteArticle_user", joinColumns = {
-			@JoinColumn(name = "favoriteArticle_id") }, inverseJoinColumns = { @JoinColumn(name = "user_id") })
+			@JoinColumn(name = "favoriteArticle_id") },
+			inverseJoinColumns = { @JoinColumn(name = "user_id")
+			})
+	
 	private Set<User> users = new HashSet<>();
 
 	////////// Constructors \\\\\\\\\\
@@ -67,6 +70,12 @@ public class FavoriteArticle {
 		this.pubmedUrl = pubmedUrl;
 		this.keywordsList = keywordsList;
 //		this.authorsList = authorsList;
+	}
+	
+	// Constructor fo Junit test
+	public FavoriteArticle(String articleTitle) {
+		super();
+		this.articleTitle = articleTitle;
 	}
 
 	////////// toString \\\\\\\\\\
@@ -145,6 +154,15 @@ public class FavoriteArticle {
 		this.keywordsList = keywordsList;
 	}
 
+	public Set<User> getUsers() {
+		return users;
+	}
+
+	public void setUsers(Set<User> users) {
+		this.users = users;
+	}
+
+	
 //	public List<Author> getAuthorsList() {
 //		return authorsList;
 //	}
