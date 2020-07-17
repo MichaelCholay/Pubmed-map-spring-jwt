@@ -1,0 +1,32 @@
+# This workflow will build a Java project with Maven
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+      env:
+        CLEARDB_DATABASE: ${{ secrets.CLEARDB_DATABASE }}
+        CLEARDB_DATABASE_URL: ${{ secrets.CLEARDB_DATABASE_URL }}
+        CLEARDB_HOST: ${{ secrets.CLEARDB_HOST }}
+        CLEARDB_PASSWORD: ${{ secrets.CLEARDB_PASSWORD }}
+        CLEARDB_USERNAME: ${{ secrets.CLEARDB_USERNAME }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        PORT_JWT_MS: ${{ secrets.PORT_JWT_MS }}
