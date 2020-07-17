@@ -5,6 +5,8 @@ import java.util.Set;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,11 +27,13 @@ import fr.isika.projet4.jwtauthentication.message.request.LoginForm;
 import fr.isika.projet4.jwtauthentication.message.request.SignUpForm;
 import fr.isika.projet4.jwtauthentication.message.response.JwtResponse;
 import fr.isika.projet4.jwtauthentication.message.response.ResponseMessage;
+import fr.isika.projet4.jwtauthentication.model.FavoriteArticle;
 import fr.isika.projet4.jwtauthentication.model.Role;
 import fr.isika.projet4.jwtauthentication.model.RoleName;
 import fr.isika.projet4.jwtauthentication.model.User;
 import fr.isika.projet4.jwtauthentication.repository.RoleRepository;
 import fr.isika.projet4.jwtauthentication.repository.UserRepository;
+import fr.isika.projet4.jwtauthentication.response.ArticleResponse;
 import fr.isika.projet4.jwtauthentication.security.jwt.JwtProvider;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -51,9 +56,21 @@ public class AuthRestAPIs {
 	@Autowired
 	JwtProvider jwtProvider;
 
+	Logger log = LoggerFactory.getLogger(this.getClass());
 	
-	
-	
+	// add an article to favorite
+	@PostMapping("/myFavoriteArticles")
+	public ResponseEntity<?> addFavoriteArticle(@Valid @RequestBody User user) {
+		User userConnected = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> 
+		new UsernameNotFoundException("The user with username :" + user.getUsername() + " doesn't exist."));
+		
+		ArticleResponse articles = new ArticleResponse();
+		
+		for (FavoriteArticle favoriteArticle: userConnected.getFavoriteArticles()) {
+			articles.getFavoriteArticles().add(favoriteArticle.get_id().toString());
+		}
+	return ResponseEntity.ok().body(articles);
+	}
 	
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginForm loginRequest) {
