@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Email;
@@ -50,8 +51,9 @@ public class User {
 	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
 
-	@ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "users")
-	private Set<FavoriteArticle> favoriteArticles = new HashSet<>();
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "profilUserArticleId")
+	ProfilUser profilUser = new ProfilUser();;
 
 	public User() {
 	}
@@ -117,12 +119,13 @@ public class User {
 		this.roles = roles;
 	}
 
-	public Set<FavoriteArticle> getFavoriteArticles() {
-		return favoriteArticles;
+
+	public ProfilUser getProfilUser() {
+		return profilUser;
 	}
 
-	public void setFavoriteArticles(Set<FavoriteArticle> favoriteArticles) {
-		this.favoriteArticles = favoriteArticles;
+	public void setProfilUser(ProfilUser profilUser) {
+		this.profilUser = profilUser;
 	}
 	
 	

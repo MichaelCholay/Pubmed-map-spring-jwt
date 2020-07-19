@@ -59,18 +59,18 @@ public class AuthRestAPIs {
 	Logger log = LoggerFactory.getLogger(this.getClass());
 	
 	// add an article to favorite
-	@PostMapping("/myFavoriteArticles")
-	public ResponseEntity<?> addFavoriteArticle(@Valid @RequestBody User user) {
-		User userConnected = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> 
-		new UsernameNotFoundException("The user with username :" + user.getUsername() + " doesn't exist."));
-		
-		ArticleResponse articles = new ArticleResponse();
-		
-		for (FavoriteArticle favoriteArticle: userConnected.getFavoriteArticles()) {
-			articles.getFavoriteArticles().add(favoriteArticle.get_id().toString());
-		}
-	return ResponseEntity.ok().body(articles);
-	}
+//	@PostMapping("/myFavoriteArticles")
+//	public ResponseEntity<?> addFavoriteArticle(@Valid @RequestBody User user) {
+//		User userConnected = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> 
+//		new UsernameNotFoundException("The user with username :" + user.getUsername() + " doesn't exist."));
+//		
+//		ArticleResponse articles = new ArticleResponse();
+//		
+//		for (FavoriteArticle favoriteArticle: userConnected.getFavoriteArticles()) {
+//			articles.getFavoriteArticles().add(favoriteArticle.get_id().toString());
+//		}
+//	return ResponseEntity.ok().body(articles);
+//	}
 	
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginForm loginRequest) {
