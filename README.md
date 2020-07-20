@@ -12,20 +12,20 @@ Pubmed-map is divided into 4 parts available in this Github account :
    - [Pubmed-map - Angular]([https://github.com/MichaelCholay/Pubmed-map-Front](https://github.com/MichaelCholay/Pubmed-map-Front)), the front part of this project based on open-source [Leaflet library]([http://www.leafletjs.com](http://www.leafletjs.com))
  
 
-## Technologies for development of Pubmed-map - Spring article
+## Technologies for development of Pubmed-map - Spring authentification
    
    - Java 8
    - Spring boot v2.3.1 ⇒ java-based microservices
    - MySQL v8, relational database ⇒ user and favorite articles storage
   - Apache maven v3.6.3 ⇒ build tool that manage Java projects
 
-## Technologies for CI/CD of Pubmed-map Spring article
+## Technologies for CI/CD of Pubmed-map Spring authentification
    
    - [Heroku](www.heroku.com), Cloud application platform
    - [ClearDB](www.cleardb.com), Cloud MySQL database
    - [GitHub actions]([https://fr.github.com/features/actions](https://fr.github.com/features/actions)), CI/CD workflow
 
-## How to use Pubmed-map - Spring microservice article
+## How to use Pubmed-map - Spring microservice authentification
 
 ### Installation
    In your terminal :
