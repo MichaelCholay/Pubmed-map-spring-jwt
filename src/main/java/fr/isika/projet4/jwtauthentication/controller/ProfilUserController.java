@@ -39,12 +39,12 @@ public class ProfilUserController {
     }
 	
 	@GetMapping(value = "/{Articleid}")
-	public FavoriteArticle getByidArticle(@PathVariable("Articleid") Long articleId) {
+	public FavoriteArticle getByidArticle(@PathVariable("articleId") Long articleId) {
 	  return favoriteArticlesRepo.findByArticleId(articleId);
 	}
 	
 	@GetMapping(value = "/exists/{Articleid}")
-	public boolean isArticleIdAlreadyHere(@PathVariable("Aticleid") Long articleId) {
+	public boolean isArticleIdAlreadyHere(@PathVariable("articleId") Long articleId) {
 	  return favoriteArticlesRepo.existsByArticleId(articleId);
 	}
 	

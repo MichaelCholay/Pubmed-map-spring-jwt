@@ -15,7 +15,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,13 +26,12 @@ import fr.isika.projet4.jwtauthentication.message.request.LoginForm;
 import fr.isika.projet4.jwtauthentication.message.request.SignUpForm;
 import fr.isika.projet4.jwtauthentication.message.response.JwtResponse;
 import fr.isika.projet4.jwtauthentication.message.response.ResponseMessage;
-import fr.isika.projet4.jwtauthentication.model.FavoriteArticle;
+import fr.isika.projet4.jwtauthentication.model.ProfilUser;
 import fr.isika.projet4.jwtauthentication.model.Role;
 import fr.isika.projet4.jwtauthentication.model.RoleName;
 import fr.isika.projet4.jwtauthentication.model.User;
 import fr.isika.projet4.jwtauthentication.repository.RoleRepository;
 import fr.isika.projet4.jwtauthentication.repository.UserRepository;
-import fr.isika.projet4.jwtauthentication.response.ArticleResponse;
 import fr.isika.projet4.jwtauthentication.security.jwt.JwtProvider;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -128,7 +126,12 @@ public class AuthRestAPIs {
 
 		user.setRoles(roles);
 		userRepository.save(user);
-
+		
+		ProfilUser profilUser = new ProfilUser();
+		user.setProfilUser(profilUser);
+		user.setRoles(roles);
+		userRepository.save(user);
+		
 		return new ResponseEntity<>(new ResponseMessage("User registered successfully!"), HttpStatus.OK);
 	}
 }
